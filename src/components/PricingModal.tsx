@@ -44,25 +44,16 @@ const PRICING_PLANS = {
 };
 
 export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: PricingModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showClerkPricing, setShowClerkPricing] = useState(false);
 
   const handlePlanSelect = (planKey: string) => {
     if (planKey === 'free') {
       // Handle downgrade to free (if needed)
-      setSelectedPlan(planKey);
       return;
     }
 
     // For paid plans, show Clerk pricing table
-    setSelectedPlan(planKey);
     setShowClerkPricing(true);
-  };
-
-  const handleUpgradeSuccess = () => {
-    // This would be called after successful subscription
-    onClose();
-    window.location.reload(); // Refresh to update subscription status
   };
 
   if (showClerkPricing) {

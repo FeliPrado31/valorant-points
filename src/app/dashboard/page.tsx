@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Target, Trophy, Users, RefreshCw, Plus, Calendar, Sword, Shield } from 'lucide-react';
-import Link from 'next/link';
+import { Container } from '@/components/ui/container';
+import { Grid } from '@/components/ui/grid';
+import Navigation from '@/components/Navigation';
+import { Target, Trophy, Users, Plus, Calendar, Sword, Shield } from 'lucide-react';
 import SubscriptionStatus from '@/components/SubscriptionStatus';
 import PricingModal from '@/components/PricingModal';
 
@@ -51,18 +53,14 @@ export default function Dashboard() {
   const { user } = useUser();
   const [userMissions, setUserMissions] = useState<UserMission[]>([]);
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<{ username: string; valorantTag: string; riotId?: { puuid: string; region: string }; subscription?: { tier: string } } | null>(null);
   const [recentMatches, setRecentMatches] = useState<RecentMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [matchesLoading, setMatchesLoading] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     console.log('🔍 Dashboard: Starting fetchData()');
     try {
       const [userMissionsRes, missionsRes, userRes] = await Promise.all([
@@ -114,7 +112,11 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const fetchRecentMatches = async () => {
     console.log('🎮 Dashboard: Starting fetchRecentMatches()');
@@ -248,59 +250,28 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 border-b border-slate-700">
-        <Link href="/" className="flex items-center space-x-2">
-          <Target className="h-8 w-8 text-red-500" />
-          <span className="text-2xl font-bold text-white">Valorant Missions</span>
-        </Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/profile">
-            <Button
-              variant="outline"
-              className="text-white border-slate-600 hover:bg-slate-800"
-            >
-              Profile
-            </Button>
-          </Link>
-          <Link href="/subscription">
-            <Button
-              variant="outline"
-              className="text-white border-slate-600 hover:bg-slate-800"
-            >
-              Subscription
-            </Button>
-          </Link>
-          <Button
-            onClick={refreshProgress}
-            disabled={refreshing}
-            variant="outline"
-            className="text-white border-slate-600 hover:bg-slate-800"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh Progress
-          </Button>
-          <div className="text-white">
-            Welcome, {user?.firstName || user?.username}!
-          </div>
-        </div>
-      </nav>
+      <Navigation
+        user={user}
+        onRefresh={refreshProgress}
+        refreshing={refreshing}
+      />
 
-      <div className="container mx-auto px-6 py-8">
+      <Container size="xl" padding="md" className="py-4 sm:py-6 lg:py-8">
         {/* Welcome Section */}
         {userProfile && (
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <Card className="bg-slate-800/50 border-slate-700">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
                       Welcome back, {userProfile.username}!
                     </h2>
-                    <p className="text-gray-300">
+                    <p className="text-gray-300 text-sm sm:text-base">
                       Connected Riot ID: <span className="text-red-400 font-semibold">{userProfile.valorantTag}</span>
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <div className="text-sm text-gray-400">Ready to complete missions!</div>
                   </div>
                 </div>
@@ -310,12 +281,16 @@ export default function Dashboard() {
         )}
 
         {/* Subscription Status */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <SubscriptionStatus onUpgrade={() => setShowPricingModal(true)} />
         </div>
 
         {/* Stats Overview */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <Grid
+          cols={{ default: 1, sm: 2, lg: 3 }}
+          gap="md"
+          className="mb-6 sm:mb-8"
+        >
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Active Missions</CardTitle>
@@ -345,26 +320,26 @@ export default function Dashboard() {
               <div className="text-2xl font-bold text-white">{totalPoints}</div>
             </CardContent>
           </Card>
-        </div>
+        </Grid>
 
         {/* Recent Matches */}
         {userProfile && userProfile.riotId && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Recent Matches</h2>
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Recent Matches</h2>
             {matchesLoading ? (
               <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 sm:p-6 text-center">
                   <div className="text-gray-300">Loading recent matches...</div>
                 </CardContent>
               </Card>
             ) : recentMatches.length === 0 ? (
               <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 sm:p-6 text-center">
                   <div className="text-gray-300">No recent matches found. Play some Valorant to see your match history!</div>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="md">
                 {recentMatches.map((match) => (
                   <Card key={match.matchId} className="bg-slate-800/50 border-slate-700">
                     <CardHeader className="pb-3">
@@ -383,6 +358,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           {match.agentImage && (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={match.agentImage}
                               alt={match.agent}
@@ -421,22 +397,22 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
+              </Grid>
             )}
           </div>
         )}
 
         {/* Active Missions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Active Missions</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Active Missions</h2>
           {activeMissions.length === 0 ? (
             <Card className="bg-slate-800/50 border-slate-700">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-4 sm:p-6 text-center">
                 <p className="text-gray-300 mb-4">No active missions. Start a new mission below!</p>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="md">
               {activeMissions.map((userMission) => (
                 <Card key={userMission.id} className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
@@ -476,14 +452,14 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
+            </Grid>
           )}
         </div>
 
         {/* Available Missions */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">Available Missions</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Available Missions</h2>
+          <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="md">
             {availableMissions
               .filter(mission => !userMissions.some(um => um.missionId === mission.id && !um.isCompleted))
               .map((mission) => (
@@ -518,15 +494,15 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               ))}
-          </div>
+          </Grid>
         </div>
-      </div>
+      </Container>
 
       {/* Pricing Modal */}
       <PricingModal
         isOpen={showPricingModal}
         onClose={() => setShowPricingModal(false)}
-        currentTier={userProfile?.subscription?.tier || 'free'}
+        currentTier={(userProfile?.subscription?.tier as 'free' | 'standard' | 'premium') || 'free'}
       />
     </div>
   );

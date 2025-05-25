@@ -7,9 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-import { Target, User, Globe, Save, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
+import { Container } from '@/components/ui/container';
+import Navigation from '@/components/Navigation';
+import { User, Globe, Save } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -81,7 +81,6 @@ export default function Profile() {
       const response = await fetch(`/api/valorant/player?name=${formData.valorantName}&tag=${formData.valorantTag}`);
 
       if (response.ok) {
-        const playerData = await response.json();
         setPlayerVerified(true);
         alert('Valorant account verified successfully!');
       } else {
@@ -154,21 +153,9 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 border-b border-slate-700">
-        <Link href="/" className="flex items-center space-x-2">
-          <Target className="h-8 w-8 text-red-500" />
-          <span className="text-2xl font-bold text-white">Valorant Missions</span>
-        </Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/dashboard">
-            <Button variant="outline" className="text-white border-slate-600 hover:bg-slate-800">
-              Dashboard
-            </Button>
-          </Link>
-        </div>
-      </nav>
+      <Navigation user={user} />
 
-      <div className="container mx-auto px-6 py-8 max-w-2xl">
+      <Container size="md" padding="md" className="py-4 sm:py-6 lg:py-8">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <div className="flex items-center space-x-2">
@@ -179,7 +166,7 @@ export default function Profile() {
               Configure your profile and connect your Valorant account to start tracking missions.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-4 sm:p-6 space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white">Basic Information</h3>
@@ -217,7 +204,7 @@ export default function Profile() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="valorantName" className="text-white">
                     Riot ID
@@ -261,13 +248,14 @@ export default function Profile() {
 
 
 
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
                 {!riotIdLinked ? (
                   <Button
                     onClick={verifyValorantPlayer}
                     disabled={verifying || !formData.valorantName || !formData.valorantTag}
-                    variant="outline"
-                    className="text-white border-slate-600 hover:bg-slate-800"
+                    variant="outline-light"
+                    size="default"
+                    className="w-full sm:w-auto"
                   >
                     <Globe className={`h-4 w-4 mr-2 ${verifying ? 'animate-spin' : ''}`} />
                     Verify Account
@@ -290,6 +278,7 @@ export default function Profile() {
               <Button
                 onClick={saveProfile}
                 disabled={saving || !formData.username}
+                size="lg"
                 className="w-full bg-red-600 hover:bg-red-700 text-white"
               >
                 <Save className={`h-4 w-4 mr-2 ${saving ? 'animate-spin' : ''}`} />
@@ -298,7 +287,7 @@ export default function Profile() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </Container>
     </div>
   );
 }

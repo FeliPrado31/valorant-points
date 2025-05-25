@@ -56,6 +56,15 @@ export interface ValorantPlayer {
   name: string;
   tag: string;
   region: string;
+  account_level: number;
+  card: {
+    small: string;
+    large: string;
+    wide: string;
+    id: string;
+  };
+  last_update: string;
+  last_update_raw: number;
 }
 
 export interface ValorantMatchData {
@@ -71,8 +80,8 @@ export interface ValorantMatchData {
     queue: string;
     season_id: string;
     platform: string;
-    party_rr_penalities: any;
-    premier_info: any;
+    party_rr_penalities: Record<string, unknown>;
+    premier_info: Record<string, unknown>;
     region: string;
     cluster: string;
   };
@@ -150,8 +159,8 @@ export interface ValorantMatchData {
       damage_made: number;
       damage_received: number;
     }>;
-    red: any[];
-    blue: any[];
+    red: Record<string, unknown>[];
+    blue: Record<string, unknown>[];
   };
   teams: {
     red: {
@@ -170,23 +179,23 @@ export interface ValorantMatchData {
     end_type: string;
     bomb_planted: boolean;
     bomb_defused: boolean;
-    plant_events: any;
-    defuse_events: any;
+    plant_events: Record<string, unknown>;
+    defuse_events: Record<string, unknown>;
     player_stats: Array<{
-      ability_casts: any;
+      ability_casts: Record<string, unknown>;
       player_puuid: string;
       player_display_name: string;
       player_tag: string;
       player_team: string;
-      damage_events: any[];
+      damage_events: Record<string, unknown>[];
       damage: number;
       bodyshots: number;
       headshots: number;
       legshots: number;
-      kill_events: any[];
+      kill_events: Record<string, unknown>[];
       kills: number;
       score: number;
-      economy: any;
+      economy: Record<string, unknown>;
       was_afk: boolean;
       was_penalized: boolean;
       stayed_in_spawn: boolean;
@@ -203,13 +212,16 @@ export class ValorantAPIService {
       console.log(`Fetching player: ${encodedName}#${encodedTag}`);
       const response = await valorantApi.get(`/account/${encodedName}/${encodedTag}`);
       return response.data.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const axiosError = error as { response?: { status?: number; statusText?: string; data?: unknown }; config?: { url?: string } };
+
       console.error('Error fetching player:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        url: error.config?.url
+        message: errorMessage,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        data: axiosError.response?.data,
+        url: axiosError.config?.url
       });
 
       // Re-throw the error so the calling code can handle it appropriately
@@ -237,7 +249,7 @@ export class ValorantAPIService {
     }
   }
 
-  static async getPlayerStats(puuid: string, region: string = 'na'): Promise<any> {
+  static async getPlayerStats(puuid: string, region: string = 'na'): Promise<Record<string, unknown> | null> {
     try {
       const response = await valorantApi.get(`/mmr/${region}/${puuid}`);
       return response.data.data;
@@ -247,7 +259,7 @@ export class ValorantAPIService {
     }
   }
 
-  static async getRecentMatches(puuid: string, region: string = 'na', size: number = 3): Promise<any[]> {
+  static async getRecentMatches(puuid: string, region: string = 'na', size: number = 3): Promise<ValorantMatchData[]> {
     try {
       // Use the v3 endpoint which is confirmed to work
       const response = await valorantApi.get(`/by-puuid/matches/${region}/${puuid}?size=${size}`);

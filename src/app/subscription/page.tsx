@@ -5,8 +5,10 @@ import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Target, Crown, Zap, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Container } from '@/components/ui/container';
+import { Grid } from '@/components/ui/grid';
+import Navigation from '@/components/Navigation';
+import { Target, Crown, Zap } from 'lucide-react';
 import { PricingTable, UserProfile } from '@clerk/nextjs';
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
 
@@ -24,7 +26,7 @@ interface SubscriptionInfo {
   canAcceptMissions: boolean;
   nextRefresh?: string;
   hoursUntilRefresh: number;
-  subscription: any;
+  subscription: Record<string, unknown>;
 }
 
 export default function SubscriptionPage() {
@@ -84,28 +86,12 @@ export default function SubscriptionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-6 border-b border-slate-700">
-        <Link href="/" className="flex items-center space-x-2">
-          <Target className="h-8 w-8 text-red-500" />
-          <span className="text-2xl font-bold text-white">Valorant Missions</span>
-        </Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/dashboard">
-            <Button variant="outline" className="text-white border-slate-600 hover:bg-slate-800">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
-          <div className="text-white">
-            Welcome, {user?.firstName || user?.username}!
-          </div>
-        </div>
-      </nav>
+      <Navigation user={user} />
 
-      <div className="container mx-auto px-6 py-8 max-w-4xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Subscription Management</h1>
-          <p className="text-gray-300 text-lg">
+      <Container size="lg" padding="md" className="py-4 sm:py-6 lg:py-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Subscription Management</h1>
+          <p className="text-gray-300 text-base sm:text-lg">
             Manage your subscription and unlock more missions
           </p>
         </div>
@@ -113,23 +99,23 @@ export default function SubscriptionPage() {
         {subscriptionInfo && (
           <>
             {/* Current Subscription */}
-            <Card className={`mb-8 ${getTierColor(subscriptionInfo.tier)} border-2`}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+            <Card className={`mb-6 sm:mb-8 ${getTierColor(subscriptionInfo.tier)} border-2`}>
+              <CardHeader className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                  <div className="flex items-center space-x-3 sm:space-x-4">
                     {getTierIcon(subscriptionInfo.tier)}
                     <div>
-                      <CardTitle className="text-white text-2xl">
+                      <CardTitle className="text-white text-xl sm:text-2xl">
                         {subscriptionInfo.tierInfo.name} Plan
                       </CardTitle>
-                      <CardDescription className="text-gray-300 text-lg">
+                      <CardDescription className="text-gray-300 text-base sm:text-lg">
                         {subscriptionInfo.tier === 'free' ? 'Free forever' : `$${subscriptionInfo.tierInfo.price}/month`}
                       </CardDescription>
                     </div>
                   </div>
                   <Badge
                     variant="outline"
-                    className={`text-lg px-4 py-2 ${
+                    className={`text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 ${
                       subscriptionInfo.tier === 'premium' ? 'border-yellow-500 text-yellow-500' :
                       subscriptionInfo.tier === 'standard' ? 'border-blue-500 text-blue-500' :
                       'border-gray-500 text-gray-500'
@@ -139,8 +125,8 @@ export default function SubscriptionPage() {
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+              <CardContent className="p-4 sm:p-6 space-y-6">
+                <Grid cols={{ default: 1, md: 2 }} gap="md">
                   <div>
                     <h3 className="text-white font-semibold mb-3">Plan Features</h3>
                     <ul className="space-y-2">
@@ -177,22 +163,23 @@ export default function SubscriptionPage() {
                       )}
                     </div>
                   </div>
-                </div>
+                </Grid>
               </CardContent>
             </Card>
 
             {/* Upgrade Options */}
             {subscriptionInfo.tier !== 'premium' && (
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-white mb-4">
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
                   {subscriptionInfo.tier === 'free' ? 'Upgrade Your Plan' : 'Upgrade to Premium'}
                 </h2>
-                <p className="text-gray-300 mb-6">
+                <p className="text-gray-300 mb-6 text-sm sm:text-base">
                   Get more missions and unlock advanced features
                 </p>
                 <Button
                   onClick={() => setShowPricingTable(true)}
-                  className="bg-red-600 hover:bg-red-700 text-white text-lg px-8 py-3"
+                  size="lg"
+                  className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
                 >
                   View Pricing Plans
                 </Button>
@@ -262,7 +249,7 @@ export default function SubscriptionPage() {
             </Card>
           </>
         )}
-      </div>
+      </Container>
     </div>
   );
 }

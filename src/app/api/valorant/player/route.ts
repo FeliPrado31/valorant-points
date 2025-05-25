@@ -24,17 +24,19 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json(player);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('API Route Error:', error);
 
-      if (error.message.includes('Rate limit exceeded')) {
-        return NextResponse.json({ error: error.message }, { status: 429 });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('Rate limit exceeded')) {
+        return NextResponse.json({ error: errorMessage }, { status: 429 });
       }
 
       // Handle specific HTTP errors from the Valorant API
-      if (error.response) {
-        const status = error.response.status;
-        const message = error.response.data?.message || error.response.statusText || 'API Error';
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = (error as { response: { status: number; data?: { message?: string }; statusText?: string } }).response;
+        const status = response.status;
+        const message = response.data?.message || response.statusText || 'API Error';
 
         if (status === 401) {
           return NextResponse.json({ error: 'API authentication failed' }, { status: 401 });

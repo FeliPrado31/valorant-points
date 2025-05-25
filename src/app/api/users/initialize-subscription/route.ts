@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { adminDb, User, getMaxActiveMissions } from '@/lib/firebase-admin';
 
@@ -12,7 +12,7 @@ export async function POST() {
 
     // Get user document
     const userDoc = await adminDb.collection('users').doc(userId).get();
-    
+
     if (!userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -21,7 +21,7 @@ export async function POST() {
 
     // Check if user already has subscription data
     if (userData.subscription && userData.missionLimits) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'User already has subscription data',
         subscription: userData.subscription,
         missionLimits: userData.missionLimits
@@ -51,7 +51,7 @@ export async function POST() {
       availableSlots: maxMissions
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       message: 'Subscription data initialized',
       subscription: {

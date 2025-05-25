@@ -2,21 +2,14 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function AutoRedirect() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [checking, setChecking] = useState(false);
 
-  useEffect(() => {
-    if (isLoaded && user && !checking) {
-      setChecking(true);
-      checkUserSetup();
-    }
-  }, [isLoaded, user, checking]);
-
-  const checkUserSetup = async () => {
+  const checkUserSetup = useCallback(async () => {
     try {
       const response = await fetch('/api/users');
       if (response.ok) {
@@ -37,7 +30,14 @@ export default function AutoRedirect() {
       // On error, redirect to setup to be safe
       router.push('/setup');
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (isLoaded && user && !checking) {
+      setChecking(true);
+      checkUserSetup();
+    }
+  }, [isLoaded, user, checking, checkUserSetup]);
 
   // Don't render anything, this component just handles redirection
   return null;

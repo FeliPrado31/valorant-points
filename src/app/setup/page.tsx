@@ -21,7 +21,7 @@ export default function Setup() {
     valorantTag: '',
   });
   const [playerVerified, setPlayerVerified] = useState(false);
-  const [playerData, setPlayerData] = useState<any>(null);
+  const [playerData, setPlayerData] = useState<{ name: string; tag: string; accountLevel: number; region: string; lastUpdate: string; card: { wide: string; large: string } } | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -251,6 +251,7 @@ export default function Setup() {
                     <div className="space-y-2">
                       <div className="text-white text-sm font-medium">Player Card:</div>
                       <div className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={playerData.card.wide}
                           alt="Player Card"

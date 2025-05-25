@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, tag, region = 'na' } = body;
+    const { name, tag } = body;
 
     if (!name || !tag) {
       return NextResponse.json({ error: 'Name and tag are required' }, { status: 400 });
@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
         // Check if it's linked to the current user
         const existingUser = existingUserSnapshot.docs[0];
         if (existingUser.id !== userId) {
-          return NextResponse.json({ 
-            error: 'This Riot ID is already linked to another account' 
+          return NextResponse.json({
+            error: 'This Riot ID is already linked to another account'
           }, { status: 409 });
         }
       }
@@ -57,15 +57,17 @@ export async function POST(request: NextRequest) {
         }
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Riot ID verification error:', error);
 
-      if (error.message.includes('Rate limit exceeded')) {
-        return NextResponse.json({ error: error.message }, { status: 429 });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('Rate limit exceeded')) {
+        return NextResponse.json({ error: errorMessage }, { status: 429 });
       }
 
-      if (error.response) {
-        const status = error.response.status;
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = (error as { response: { status: number } }).response;
+        const status = response.status;
         if (status === 404) {
           return NextResponse.json({ error: 'Player not found' }, { status: 404 });
         } else if (status === 429) {

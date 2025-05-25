@@ -21,7 +21,7 @@ interface SubscriptionInfo {
   canAcceptMissions: boolean;
   nextRefresh?: string;
   hoursUntilRefresh: number;
-  subscription: any;
+  subscription: Record<string, unknown>;
 }
 
 interface SubscriptionStatusProps {
@@ -95,28 +95,28 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
   return (
     <Card className="bg-slate-800/50 border-slate-700">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-2">
             {getTierIcon(subscriptionInfo.tier)}
-            <CardTitle className="text-white text-lg">
+            <CardTitle className="text-white text-base sm:text-lg">
               {subscriptionInfo.tierInfo.name} Plan
             </CardTitle>
-            <Badge className={getTierColor(subscriptionInfo.tier)}>
+            <Badge className={`${getTierColor(subscriptionInfo.tier)} text-xs sm:text-sm`}>
               {subscriptionInfo.tier === 'free' ? 'Free' : `$${subscriptionInfo.tierInfo.price}/month`}
             </Badge>
           </div>
           {subscriptionInfo.tier === 'free' && (
             <Button
               onClick={onUpgrade}
-              size="sm"
-              className="bg-red-600 hover:bg-red-700 text-white"
+              size="default"
+              className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
             >
               <ArrowUp className="h-4 w-4 mr-1" />
               Upgrade
             </Button>
           )}
         </div>
-        <CardDescription className="text-gray-300">
+        <CardDescription className="text-gray-300 text-sm">
           Manage your mission limits and subscription
         </CardDescription>
       </CardHeader>
@@ -169,16 +169,16 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
         {/* Upgrade Prompt for Free Users */}
         {subscriptionInfo.tier === 'free' && (
           <div className="pt-2 border-t border-slate-700">
-            <div className="text-center space-y-2">
+            <div className="text-center space-y-3">
               <p className="text-sm text-gray-300">
                 Want more missions? Upgrade your plan!
               </p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-slate-700/50 p-2 rounded">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="bg-slate-700/50 p-3 rounded-lg">
                   <div className="text-blue-400 font-medium">Standard</div>
                   <div className="text-gray-300">5 missions • $3/month</div>
                 </div>
-                <div className="bg-slate-700/50 p-2 rounded">
+                <div className="bg-slate-700/50 p-3 rounded-lg">
                   <div className="text-yellow-400 font-medium">Premium</div>
                   <div className="text-gray-300">10 missions • $10/month</div>
                 </div>

@@ -31,10 +31,10 @@ export async function GET() {
         ...userMissionData,
         id: doc.id,
         // Convert Firestore Timestamp objects to ISO strings
-        startedAt: userMissionData.startedAt?.toDate ? userMissionData.startedAt.toDate().toISOString() : userMissionData.startedAt,
-        acceptedAt: userMissionData.acceptedAt?.toDate ? userMissionData.acceptedAt.toDate().toISOString() : (userMissionData.acceptedAt || (userMissionData.startedAt?.toDate ? userMissionData.startedAt.toDate().toISOString() : userMissionData.startedAt)),
-        lastUpdated: userMissionData.lastUpdated?.toDate ? userMissionData.lastUpdated.toDate().toISOString() : userMissionData.lastUpdated,
-        completedAt: userMissionData.completedAt?.toDate ? userMissionData.completedAt.toDate().toISOString() : userMissionData.completedAt,
+        startedAt: userMissionData.startedAt && typeof userMissionData.startedAt === 'object' && 'toDate' in userMissionData.startedAt ? (userMissionData.startedAt as { toDate: () => Date }).toDate().toISOString() : userMissionData.startedAt,
+        acceptedAt: userMissionData.acceptedAt && typeof userMissionData.acceptedAt === 'object' && 'toDate' in userMissionData.acceptedAt ? (userMissionData.acceptedAt as { toDate: () => Date }).toDate().toISOString() : (userMissionData.acceptedAt || (userMissionData.startedAt && typeof userMissionData.startedAt === 'object' && 'toDate' in userMissionData.startedAt ? (userMissionData.startedAt as { toDate: () => Date }).toDate().toISOString() : userMissionData.startedAt)),
+        lastUpdated: userMissionData.lastUpdated && typeof userMissionData.lastUpdated === 'object' && 'toDate' in userMissionData.lastUpdated ? (userMissionData.lastUpdated as { toDate: () => Date }).toDate().toISOString() : userMissionData.lastUpdated,
+        completedAt: userMissionData.completedAt && typeof userMissionData.completedAt === 'object' && 'toDate' in userMissionData.completedAt ? (userMissionData.completedAt as { toDate: () => Date }).toDate().toISOString() : userMissionData.completedAt,
         mission: missionData
       };
 
@@ -120,11 +120,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get subscription info and check limits
-    const currentTier = getSubscriptionTier(userData);
+    const currentTier = getSubscriptionTier(userData as unknown as Record<string, unknown>);
     const maxMissions = getMaxActiveMissions(currentTier);
 
     // Check if mission slots need refresh
-    const needsRefresh = shouldRefreshMissionSlots(userData);
+    const needsRefresh = shouldRefreshMissionSlots(userData as unknown as Record<string, unknown>);
     let availableSlots = userData.missionLimits?.availableSlots || maxMissions;
 
     // Ensure availableSlots is properly set for initialized users

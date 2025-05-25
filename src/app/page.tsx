@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Container } from '@/components/ui/container';
+import { Grid } from '@/components/ui/grid';
 import { Target, Trophy, Users } from 'lucide-react';
 import AutoRedirect from '@/components/AutoRedirect';
 
@@ -15,51 +17,60 @@ export default async function Home() {
       {userId && <AutoRedirect />}
 
       {/* Navigation */}
-      <nav className="flex items-center justify-between p-6">
-        <div className="flex items-center space-x-2">
-          <Target className="h-8 w-8 text-red-500" />
-          <span className="text-2xl font-bold text-white">Valorant Missions</span>
-        </div>
-        <div className="flex items-center space-x-4">
-          {userId ? (
-            <>
-              <Link href="/dashboard">
-                <Button variant="ghost" className="text-white hover:text-red-500">
-                  Dashboard
-                </Button>
-              </Link>
-              <UserButton />
-            </>
-          ) : (
-            <>
-              <SignInButton mode="modal">
-                <Button variant="ghost" className="text-white hover:text-red-500">
-                  Sign In
-                </Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button className="bg-red-600 hover:bg-red-700 text-white">
-                  Get Started
-                </Button>
-              </SignUpButton>
-            </>
-          )}
-        </div>
+      <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-900/95 backdrop-blur-md supports-[backdrop-filter]:bg-slate-900/80">
+        <Container size="xl" padding="md">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Target className="h-8 w-8 text-red-500" />
+              <span className="text-xl sm:text-2xl font-bold text-white">
+                <span className="hidden sm:inline">Valorant Missions</span>
+                <span className="sm:hidden">VM</span>
+              </span>
+            </div>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              {userId ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button variant="ghost-light" className="text-sm sm:text-base px-3 sm:px-4 py-2">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <UserButton />
+                </>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost-light" className="text-sm sm:text-base px-3 sm:px-4 py-2">
+                      <span className="hidden sm:inline">Sign In</span>
+                      <span className="sm:hidden">Sign In</span>
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button className="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 sm:px-4 py-2">
+                      <span className="hidden sm:inline">Get Started</span>
+                      <span className="sm:hidden">Start</span>
+                    </Button>
+                  </SignUpButton>
+                </>
+              )}
+            </div>
+          </div>
+        </Container>
       </nav>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-6 py-20">
+      <Container size="xl" padding="md" className="py-12 sm:py-16 lg:py-20">
         <div className="text-center">
-          <h1 className="text-6xl font-bold text-white mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
             Level Up Your <span className="text-red-500">Valorant</span> Game
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-8 max-w-3xl mx-auto px-4">
             Complete challenging missions based on your real Valorant gameplay.
             Track your progress, earn rewards, and compete with other players.
           </p>
           {!userId && (
             <SignUpButton mode="modal">
-              <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-lg px-8 py-4">
+              <Button size="xl" className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
                 Start Your Journey
               </Button>
             </SignUpButton>
@@ -67,7 +78,7 @@ export default async function Home() {
         </div>
 
         {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20">
+        <Grid cols={{ default: 1, md: 3 }} gap="lg" className="mt-12 sm:mt-16 lg:mt-20">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
               <div className="flex items-center space-x-2">
@@ -77,7 +88,7 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <CardDescription className="text-gray-300">
-                Complete missions like "Get 10 headshots" or "Win 5 Spike Rush games"
+                Complete missions like &quot;Get 10 headshots&quot; or &quot;Win 5 Spike Rush games&quot;
                 based on your actual Valorant match data.
               </CardDescription>
             </CardContent>
@@ -112,12 +123,12 @@ export default async function Home() {
               </CardDescription>
             </CardContent>
           </Card>
-        </div>
+        </Grid>
 
         {/* How it Works */}
-        <div className="mt-20 text-center">
-          <h2 className="text-4xl font-bold text-white mb-12">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-12 sm:mt-16 lg:mt-20 text-center">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-8 sm:mb-12">How It Works</h2>
+          <Grid cols={{ default: 1, md: 3 }} gap="lg">
             <div className="space-y-4">
               <div className="bg-red-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
                 <span className="text-2xl font-bold text-white">1</span>
@@ -145,9 +156,9 @@ export default async function Home() {
                 Play Valorant normally and watch your mission progress update automatically.
               </p>
             </div>
-          </div>
+          </Grid>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

@@ -71,8 +71,8 @@ export async function GET(request: NextRequest) {
         .where('userId', '==', userId)
         .where('missionId', '==', missionId)
         .get();
-      
-      userMissions = missionDoc.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      userMissions = missionDoc.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; startedAt: unknown; missionId: string }));
       console.log(`🎯 API: Found specific mission: ${missionId}`);
     } else {
       // Get all active missions
@@ -81,8 +81,8 @@ export async function GET(request: NextRequest) {
         .where('userId', '==', userId)
         .where('isCompleted', '==', false)
         .get();
-      
-      userMissions = missionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      userMissions = missionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; startedAt: unknown; missionId: string }));
       console.log(`📋 API: Found ${userMissions.length} active missions`);
     }
 
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
 
       for (const match of matches) {
         console.log(`\n🔍 Processing match: ${match.metadata?.matchid || 'unknown'}`);
-        
+
         // Find the target player in the match (v3 format)
         const playerData = match.players?.all_players?.find(p => p.puuid === puuid);
 
@@ -139,8 +139,10 @@ export async function GET(request: NextRequest) {
         let relevantMissionId = undefined;
 
         for (const userMission of userMissions) {
-          const missionStartTime = userMission.startedAt.toDate();
-          
+          const missionStartTime = userMission.startedAt && typeof userMission.startedAt === 'object' && 'toDate' in userMission.startedAt
+            ? (userMission.startedAt as { toDate: () => Date }).toDate()
+            : new Date(userMission.startedAt as unknown as string);
+
           if (matchPlayedAt > missionStartTime) {
             missionRelevant = true;
             relevantMissionId = userMission.missionId;
@@ -174,29 +176,30 @@ export async function GET(request: NextRequest) {
       // Filter matches if specific mission requested
       let filteredMatches = processedMatches;
       if (missionId) {
-        filteredMatches = processedMatches.filter(match => 
+        filteredMatches = processedMatches.filter(match =>
           match.missionRelevant && match.missionId === missionId
         );
         console.log(`🎯 Filtered to ${filteredMatches.length} matches for mission ${missionId}`);
       }
 
-      console.log('✅ API: Successfully processed matches', { 
+      console.log('✅ API: Successfully processed matches', {
         totalMatches: processedMatches.length,
         filteredMatches: filteredMatches.length,
         missionRelevantMatches: processedMatches.filter(m => m.missionRelevant).length
       });
 
-      return NextResponse.json({ 
+      return NextResponse.json({
         matches: filteredMatches,
         totalMatches: processedMatches.length,
         missionRelevantMatches: processedMatches.filter(m => m.missionRelevant).length
       });
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Error fetching recent matches:', error);
 
-      if (error.message.includes('Rate limit exceeded')) {
-        return NextResponse.json({ error: error.message }, { status: 429 });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('Rate limit exceeded')) {
+        return NextResponse.json({ error: errorMessage }, { status: 429 });
       }
 
       return NextResponse.json({ error: 'Failed to fetch recent matches' }, { status: 500 });

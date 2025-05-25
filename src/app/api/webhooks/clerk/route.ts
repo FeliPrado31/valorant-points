@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   // Create a new Svix instance with your secret.
   const wh = new Webhook(webhookSecret);
 
-  let evt: any;
+  let evt: { type: string; data: Record<string, unknown> };
 
   // Verify the payload with the headers
   try {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       'svix-id': svix_id,
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
-    });
+    }) as { type: string; data: Record<string, unknown> };
   } catch (err) {
     console.error('❌ Error verifying webhook:', err);
     return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
@@ -73,9 +73,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleUserCreated(userData: any) {
+async function handleUserCreated(userData: Record<string, unknown>) {
   try {
-    const userId = userData.id;
+    const userId = userData.id as string;
 
     if (!userId) {
       console.error('❌ No user ID in user.created data');
@@ -89,11 +89,12 @@ async function handleUserCreated(userData: any) {
     const nextRefresh = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const freeTierMaxMissions = getMaxActiveMissions('free');
 
+    const emailAddresses = userData.email_addresses as Array<{ email_address: string }> | undefined;
     const userProfile = {
       id: userId,
       clerkId: userId,
-      email: userData.email_addresses?.[0]?.email_address || '',
-      username: userData.username || userData.first_name || 'User',
+      email: emailAddresses?.[0]?.email_address || '',
+      username: (userData.username as string) || (userData.first_name as string) || 'User',
       subscription: {
         tier: 'free',
         status: 'active',
@@ -121,9 +122,9 @@ async function handleUserCreated(userData: any) {
   }
 }
 
-async function handleUserUpdated(userData: any) {
+async function handleUserUpdated(userData: Record<string, unknown>) {
   try {
-    const userId = userData.id;
+    const userId = userData.id as string;
 
     if (!userId) {
       console.error('❌ No user ID in user.updated data');
@@ -141,13 +142,16 @@ async function handleUserUpdated(userData: any) {
     }
 
     // Check for subscription data in metadata
-    const subscriptionData = userData.private_metadata?.subscription || userData.public_metadata?.subscription;
+    const privateMetadata = userData.private_metadata as Record<string, unknown> | undefined;
+    const publicMetadata = userData.public_metadata as Record<string, unknown> | undefined;
+    const subscriptionData = privateMetadata?.subscription || publicMetadata?.subscription;
 
     if (subscriptionData) {
       console.log('💳 Subscription data found in metadata:', subscriptionData);
 
-      const { planId, status, subscriptionId } = subscriptionData;
-      const tier = getTierFromClerkPlanId(planId);
+      const subscription = subscriptionData as { planId?: string; status?: string; subscriptionId?: string };
+      const { planId, status, subscriptionId } = subscription;
+      const tier = getTierFromClerkPlanId(planId || '');
       const maxMissions = getMaxActiveMissions(tier);
 
       const now = new Date();
@@ -176,16 +180,17 @@ async function handleUserUpdated(userData: any) {
       });
     } else {
       // Update basic user info
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updatedAt: new Date()
       };
 
-      if (userData.email_addresses?.[0]?.email_address) {
-        updateData.email = userData.email_addresses[0].email_address;
+      const emailAddresses = userData.email_addresses as Array<{ email_address: string }> | undefined;
+      if (emailAddresses?.[0]?.email_address) {
+        updateData.email = emailAddresses[0].email_address;
       }
 
       if (userData.username || userData.first_name) {
-        updateData.username = userData.username || userData.first_name;
+        updateData.username = (userData.username as string) || (userData.first_name as string);
       }
 
       await adminDb.collection('users').doc(userId).update(updateData);
@@ -198,9 +203,9 @@ async function handleUserUpdated(userData: any) {
   }
 }
 
-async function handleUserDeleted(userData: any) {
+async function handleUserDeleted(userData: Record<string, unknown>) {
   try {
-    const userId = userData.id;
+    const userId = userData.id as string;
 
     if (!userId) {
       console.error('❌ No user ID in user.deleted data');

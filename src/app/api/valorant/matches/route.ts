@@ -23,9 +23,10 @@ export async function GET(request: NextRequest) {
     try {
       const matches = await ValorantAPIService.getPlayerMatches(puuid, region, size);
       return NextResponse.json(matches);
-    } catch (error: any) {
-      if (error.message.includes('Rate limit exceeded')) {
-        return NextResponse.json({ error: error.message }, { status: 429 });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('Rate limit exceeded')) {
+        return NextResponse.json({ error: errorMessage }, { status: 429 });
       }
       throw error;
     }
@@ -124,10 +125,11 @@ export async function POST(request: NextRequest) {
 
       // Save match to Firestore
       const matchRef = await adminDb.collection('valorantMatches').add(matchData);
-      processedMatches.push({ id: matchRef.id, ...matchData });
+      const savedMatch = { id: matchRef.id, ...matchData };
+      processedMatches.push(savedMatch);
 
       // Update mission progress
-      await updateMissionProgress(userId, matchData);
+      await updateMissionProgress(userId, savedMatch);
     }
 
     return NextResponse.json({
@@ -160,7 +162,9 @@ async function updateMissionProgress(userId: string, matchData: ValorantMatch) {
     const userMission = userMissionDoc.data() as UserMission;
 
     // CRITICAL: Only count matches played AFTER mission acceptance
-    const missionStartTime = userMission.startedAt.toDate();
+    const missionStartTime = userMission.startedAt && typeof userMission.startedAt === 'object' && 'toDate' in userMission.startedAt
+      ? (userMission.startedAt as { toDate: () => Date }).toDate()
+      : new Date(userMission.startedAt as unknown as string);
     const matchPlayTime = matchData.playedAt;
 
     console.log(`🕐 Mission ${userMission.missionId} timestamp check:`, {

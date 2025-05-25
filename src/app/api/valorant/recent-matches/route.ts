@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { ValorantAPIService } from '@/lib/valorant-api';
 import { adminDb } from '@/lib/firebase-admin';
@@ -17,7 +17,7 @@ export interface ProcessedMatch {
   agentImage?: string;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   console.log('🔍 API: /api/valorant/recent-matches called');
   try {
     const { userId } = await auth();
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
 
       for (const match of matches) {
         // Find the current user's data in the match (v3 format)
-        const playerData = match.players?.all_players?.find((p: any) => p.puuid === puuid);
+        const playerData = match.players?.all_players?.find((p: { puuid: string }) => p.puuid === puuid);
 
         if (!playerData) {
           console.warn(`Player data not found for match ${match.metadata?.matchid || 'unknown'}`);
@@ -108,11 +108,12 @@ export async function GET(request: NextRequest) {
       });
       return NextResponse.json({ matches: processedMatches });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching recent matches:', error);
 
-      if (error.message.includes('Rate limit exceeded')) {
-        return NextResponse.json({ error: error.message }, { status: 429 });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('Rate limit exceeded')) {
+        return NextResponse.json({ error: errorMessage }, { status: 429 });
       }
 
       return NextResponse.json({ error: 'Failed to fetch recent matches' }, { status: 500 });

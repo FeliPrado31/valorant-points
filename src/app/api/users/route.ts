@@ -102,7 +102,7 @@ export async function PUT(request: NextRequest) {
     const currentUserData = userDoc.data() as User;
 
     // Prepare update data - only allow certain fields to be updated
-    const updateData: any = {
+    const updateData: Partial<User> = {
       updatedAt: new Date(),
     };
 

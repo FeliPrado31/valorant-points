@@ -43,30 +43,33 @@ export const CLERK_PLAN_ID_TO_TIER = {
 export type SubscriptionTierKey = keyof typeof SUBSCRIPTION_TIERS;
 
 // Utility functions for subscription management (client-safe)
-export const getSubscriptionTier = (user: any): SubscriptionTierKey => {
-  return user?.subscription?.tier || 'free';
+export const getSubscriptionTier = (user: Record<string, unknown>): SubscriptionTierKey => {
+  const subscription = user?.subscription as { tier?: SubscriptionTierKey } | undefined;
+  return subscription?.tier || 'free';
 };
 
 export const getMaxActiveMissions = (tier: SubscriptionTierKey): number => {
   return SUBSCRIPTION_TIERS[tier].maxActiveMissions;
 };
 
-export const shouldRefreshMissionSlots = (user: any): boolean => {
-  if (!user?.missionLimits?.lastRefresh) return true;
+export const shouldRefreshMissionSlots = (user: Record<string, unknown>): boolean => {
+  const missionLimits = user?.missionLimits as { lastRefresh?: unknown } | undefined;
+  if (!missionLimits?.lastRefresh) return true;
 
   const now = new Date();
   let lastRefresh: Date;
 
   // Handle different date formats: Firestore Timestamp, Date object, or string
-  if (user.missionLimits.lastRefresh.toDate && typeof user.missionLimits.lastRefresh.toDate === 'function') {
+  const lastRefreshValue = missionLimits.lastRefresh;
+  if (lastRefreshValue && typeof lastRefreshValue === 'object' && 'toDate' in lastRefreshValue && typeof (lastRefreshValue as { toDate: () => Date }).toDate === 'function') {
     // Firestore Timestamp
-    lastRefresh = user.missionLimits.lastRefresh.toDate();
-  } else if (user.missionLimits.lastRefresh instanceof Date) {
+    lastRefresh = (lastRefreshValue as { toDate: () => Date }).toDate();
+  } else if (lastRefreshValue instanceof Date) {
     // Already a Date object
-    lastRefresh = user.missionLimits.lastRefresh;
+    lastRefresh = lastRefreshValue;
   } else {
     // String or other format
-    lastRefresh = new Date(user.missionLimits.lastRefresh);
+    lastRefresh = new Date(lastRefreshValue as string);
   }
 
   // Validate the date

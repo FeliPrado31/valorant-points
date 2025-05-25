@@ -62,7 +62,7 @@ export async function GET() {
       });
     }
 
-    const currentTier = getSubscriptionTier(userData);
+    const currentTier = getSubscriptionTier(userData as unknown as Record<string, unknown>);
     const maxMissions = getMaxActiveMissions(currentTier);
 
     // Get current active missions count
@@ -75,13 +75,13 @@ export async function GET() {
     const activeMissionsCount = activeMissionsSnapshot.size;
 
     // Check if mission slots need refresh
-    const needsRefresh = shouldRefreshMissionSlots(userData);
+    const needsRefresh = shouldRefreshMissionSlots(userData as unknown as Record<string, unknown>);
     let availableSlots = userData.missionLimits?.availableSlots || maxMissions;
     let nextRefresh = userData.missionLimits?.nextRefresh;
 
     // Convert Firestore Timestamp to Date if needed
-    if (nextRefresh && typeof nextRefresh.toDate === 'function') {
-      nextRefresh = nextRefresh.toDate();
+    if (nextRefresh && typeof nextRefresh === 'object' && 'toDate' in nextRefresh && typeof (nextRefresh as { toDate: () => Date }).toDate === 'function') {
+      nextRefresh = (nextRefresh as { toDate: () => Date }).toDate();
     } else if (nextRefresh && typeof nextRefresh === 'string') {
       nextRefresh = new Date(nextRefresh);
     }
