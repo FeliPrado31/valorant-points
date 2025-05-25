@@ -1,0 +1,8 @@
+.next/
+node_modules/
+.env.local
+.env
+
+# Firebase service account keys (use environment variables instead)
+serviceAccountKey.json
+*serviceAccount*.json

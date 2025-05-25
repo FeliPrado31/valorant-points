@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Missions collection - read-only for authenticated users
+    match /missions/{missionId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only admin can create/update missions
+    }
+    
+    // User missions collection - users can only access their own missions
+    match /userMissions/{userMissionId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Valorant matches collection - users can only access their own matches
+    match /valorantMatches/{matchId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Leaderboards collection - read-only for authenticated users
+    match /leaderboards/{leaderboardId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only server can update leaderboards
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
