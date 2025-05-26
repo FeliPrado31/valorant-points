@@ -130,18 +130,19 @@ async function handleUserCreated(userData: Record<string, unknown>) {
 async function handleUserUpdated(userData: Record<string, unknown>) {
   try {
     const userId = userData.id as string;
+    const timestamp = new Date().toISOString();
 
     if (!userId) {
       console.error('❌ No user ID in user.updated data');
       return;
     }
 
-    console.log('👤 Processing user.updated for:', userId);
+    console.log(`👤 [${timestamp}] Processing user.updated for:`, userId);
 
     // Check if user exists in our database
     const userDoc = await adminDb.collection('users').doc(userId).get();
     if (!userDoc.exists) {
-      console.log('⚠️ User not found in database, creating new profile');
+      console.log(`⚠️ [${timestamp}] User not found in database, creating new profile`);
       await handleUserCreated(userData);
       return;
     }
@@ -177,14 +178,16 @@ async function handleUserUpdated(userData: Record<string, unknown>) {
       }
 
       // Determine tier from planId (more secure) or use metadata tier as fallback
-      const tier = planId ? getTierFromClerkPlanId(planId) : (metaTier || 'free');
-      const maxMissions = getMaxActiveMissions(tier);
+      const tierCandidate = planId ? getTierFromClerkPlanId(planId) : (metaTier || 'free');
 
       // Security: Only allow valid tiers
-      if (!['free', 'standard', 'premium'].includes(tier)) {
-        console.error(`❌ [${timestamp}] Invalid tier detected:`, tier);
+      if (!['free', 'standard', 'premium'].includes(tierCandidate)) {
+        console.error(`❌ [${timestamp}] Invalid tier detected:`, tierCandidate);
         return;
       }
+
+      const tier = tierCandidate as 'free' | 'standard' | 'premium';
+      const maxMissions = getMaxActiveMissions(tier);
 
       const now = new Date();
       const nextRefresh = new Date(now.getTime() + 24 * 60 * 60 * 1000);
