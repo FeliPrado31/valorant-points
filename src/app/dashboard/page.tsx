@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,12 +12,16 @@ import Navigation from '@/components/Navigation';
 import { Target, Trophy, Users, Plus, Calendar, Sword, Shield } from 'lucide-react';
 import SubscriptionStatus from '@/components/SubscriptionStatus';
 import PricingModal from '@/components/PricingModal';
+import { useMissionFilters } from '@/hooks/useMissionFilters';
+import { filterMissions } from '@/lib/mission-utils';
+import { useDebounce } from '@/lib/utils';
+import MissionFiltersComponent from '@/components/MissionFilters';
 
 interface Mission {
   id: string;
   title: string;
   description: string;
-  type: string;
+  type: 'kills' | 'headshots' | 'gamemode' | 'weapon' | 'rounds' | 'wins';
   target: number;
   reward: number;
   difficulty: 'easy' | 'medium' | 'hard';
@@ -49,7 +53,7 @@ interface RecentMatch {
   agentImage?: string;
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const { user } = useUser();
   const [userMissions, setUserMissions] = useState<UserMission[]>([]);
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
@@ -59,6 +63,23 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [matchesLoading, setMatchesLoading] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+
+  // Mission filtering
+  const { filters, updateFilter, clearFilters } = useMissionFilters();
+  const debouncedSearch = useDebounce(filters.search, 300);
+
+  // Apply filters to missions
+  const filteredMissions = useMemo(() => {
+    const filtersWithDebouncedSearch = { ...filters, search: debouncedSearch };
+    return filterMissions(availableMissions, userMissions, filtersWithDebouncedSearch);
+  }, [availableMissions, userMissions, filters, debouncedSearch]);
+
+  // Filter available missions (exclude already active missions)
+  const availableFilteredMissions = useMemo(() => {
+    return filteredMissions.filter(mission =>
+      !userMissions.some(um => um.missionId === mission.id && !um.isCompleted)
+    );
+  }, [filteredMissions, userMissions]);
 
   const fetchData = useCallback(async () => {
     console.log('🔍 Dashboard: Starting fetchData()');
@@ -456,13 +477,20 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Mission Filters */}
+        <MissionFiltersComponent
+          filters={filters}
+          onFilterChange={updateFilter}
+          onClearFilters={clearFilters}
+          resultCount={availableFilteredMissions.length}
+          totalCount={availableMissions.length}
+        />
+
         {/* Available Missions */}
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Available Missions</h2>
           <Grid cols={{ default: 1, md: 2, lg: 3 }} gap="md">
-            {availableMissions
-              .filter(mission => !userMissions.some(um => um.missionId === mission.id && !um.isCompleted))
-              .map((mission) => (
+            {availableFilteredMissions.map((mission) => (
                 <Card key={mission.id} className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -505,5 +533,20 @@ export default function Dashboard() {
         currentTier={(userProfile?.subscription?.tier as 'free' | 'standard' | 'premium') || 'free'}
       />
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-white text-lg">Loading dashboard...</div>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
