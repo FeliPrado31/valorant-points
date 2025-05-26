@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_KEY = process.env.VALORANT_API_KEY;
 const BASE_URL = process.env.VALORANT_API_BASE_URL;
+const BASE_URL_V3 = 'https://api.henrikdev.xyz/valorant/v3';
 
 // Rate limiting: 30 requests per minute
 const RATE_LIMIT = 30;
@@ -42,8 +43,25 @@ const valorantApi = axios.create({
   },
 });
 
+const valorantApiV3 = axios.create({
+  baseURL: BASE_URL_V3,
+  headers: {
+    'Authorization': API_KEY,
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
 // Add rate limiting interceptor
 valorantApi.interceptors.request.use(async (config) => {
+  if (!rateLimiter.canMakeRequest()) {
+    const waitTime = rateLimiter.getWaitTime();
+    throw new Error(`Rate limit exceeded. Wait ${Math.ceil(waitTime / 1000)} seconds.`);
+  }
+  return config;
+});
+
+valorantApiV3.interceptors.request.use(async (config) => {
   if (!rateLimiter.canMakeRequest()) {
     const waitTime = rateLimiter.getWaitTime();
     throw new Error(`Rate limit exceeded. Wait ${Math.ceil(waitTime / 1000)} seconds.`);
@@ -231,7 +249,7 @@ export class ValorantAPIService {
 
   static async getPlayerMatches(puuid: string, region: string = 'na', size: number = 10): Promise<ValorantMatchData[]> {
     try {
-      const response = await valorantApi.get(`/by-puuid/matches/${region}/${puuid}?size=${size}`);
+      const response = await valorantApiV3.get(`/by-puuid/matches/${region}/${puuid}?size=${size}`);
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching player matches:', error);
@@ -262,7 +280,7 @@ export class ValorantAPIService {
   static async getRecentMatches(puuid: string, region: string = 'na', size: number = 3): Promise<ValorantMatchData[]> {
     try {
       // Use the v3 endpoint which is confirmed to work
-      const response = await valorantApi.get(`/by-puuid/matches/${region}/${puuid}?size=${size}`);
+      const response = await valorantApiV3.get(`/by-puuid/matches/${region}/${puuid}?size=${size}`);
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching recent matches:', error);
