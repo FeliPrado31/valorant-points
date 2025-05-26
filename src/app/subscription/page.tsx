@@ -94,6 +94,8 @@ export default function SubscriptionPage() {
           <p className="text-gray-300 text-base sm:text-lg">
             Manage your subscription and unlock more missions
           </p>
+
+
         </div>
 
         {subscriptionInfo && (
@@ -205,7 +207,7 @@ export default function SubscriptionPage() {
                         button: "bg-red-600 hover:bg-red-700"
                       }
                     }}
-                    newSubscriptionRedirectUrl="/subscription?success=true"
+                    newSubscriptionRedirectUrl="/subscription"
                   />
                   <div className="mt-4 text-center text-sm text-gray-400">
                     <p>Available Plans:</p>

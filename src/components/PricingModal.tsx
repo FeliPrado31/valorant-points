@@ -76,11 +76,9 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
                   button: "bg-red-600 hover:bg-red-700"
                 }
               }}
-              newSubscriptionRedirectUrl="/dashboard?subscription=success"
+              newSubscriptionRedirectUrl="/subscription"
             />
-            <div className="mt-4 text-center text-sm text-gray-400">
-              <p>Plan IDs: Standard ({SUBSCRIPTION_TIERS.standard.clerkPlanId}) • Premium ({SUBSCRIPTION_TIERS.premium.clerkPlanId})</p>
-            </div>
+
           </div>
           <div className="flex justify-center mt-6">
             <Button

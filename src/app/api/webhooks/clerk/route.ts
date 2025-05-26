@@ -45,8 +45,13 @@ export async function POST(request: NextRequest) {
 
   // Handle the webhook
   const eventType = evt.type;
-  console.log('🔔 Clerk webhook received:', eventType);
-  console.log('📊 Webhook payload:', JSON.stringify(evt.data, null, 2));
+  const timestamp = new Date().toISOString();
+
+  console.log(`🔔 [${timestamp}] Clerk webhook received:`, eventType);
+  console.log(`📊 [${timestamp}] Webhook payload:`, JSON.stringify(evt.data, null, 2));
+
+  // Security: Log webhook source for audit trail
+  console.log(`🔒 [${timestamp}] Webhook security verified - signature valid`);
 
   try {
     switch (eventType) {
@@ -144,18 +149,62 @@ async function handleUserUpdated(userData: Record<string, unknown>) {
     // Check for subscription data in metadata
     const privateMetadata = userData.private_metadata as Record<string, unknown> | undefined;
     const publicMetadata = userData.public_metadata as Record<string, unknown> | undefined;
+
+    console.log(`🔍 [${timestamp}] Checking metadata for subscription data:`, {
+      hasPrivateMetadata: !!privateMetadata,
+      hasPublicMetadata: !!publicMetadata,
+      privateKeys: privateMetadata ? Object.keys(privateMetadata) : [],
+      publicKeys: publicMetadata ? Object.keys(publicMetadata) : []
+    });
+
     const subscriptionData = privateMetadata?.subscription || publicMetadata?.subscription;
 
     if (subscriptionData) {
-      console.log('💳 Subscription data found in metadata:', subscriptionData);
+      console.log(`💳 [${timestamp}] Subscription data found in metadata:`, subscriptionData);
 
-      const subscription = subscriptionData as { planId?: string; status?: string; subscriptionId?: string };
-      const { planId, status, subscriptionId } = subscription;
-      const tier = getTierFromClerkPlanId(planId || '');
+      const subscription = subscriptionData as {
+        planId?: string;
+        status?: string;
+        subscriptionId?: string;
+        tier?: string;
+      };
+      const { planId, status, subscriptionId, tier: metaTier } = subscription;
+
+      // Security: Validate planId against our known plan IDs
+      if (planId && !['cplan_2xb4nXJsuap2kli8KvX3bIgIPAA', 'cplan_2xb4qlrucukzKqSlMKtE7pvJdq9'].includes(planId)) {
+        console.error(`❌ [${timestamp}] Invalid plan ID detected:`, planId);
+        return;
+      }
+
+      // Determine tier from planId (more secure) or use metadata tier as fallback
+      const tier = planId ? getTierFromClerkPlanId(planId) : (metaTier || 'free');
       const maxMissions = getMaxActiveMissions(tier);
+
+      // Security: Only allow valid tiers
+      if (!['free', 'standard', 'premium'].includes(tier)) {
+        console.error(`❌ [${timestamp}] Invalid tier detected:`, tier);
+        return;
+      }
 
       const now = new Date();
       const nextRefresh = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+      // Get current user data to compare changes
+      const currentUserDoc = await adminDb.collection('users').doc(userId).get();
+      const currentUserData = currentUserDoc.data();
+      const currentTier = currentUserData?.subscription?.tier || 'free';
+
+      // Security: Log tier changes for audit trail
+      if (currentTier !== tier) {
+        console.log(`🔄 [${timestamp}] TIER CHANGE DETECTED:`, {
+          userId,
+          previousTier: currentTier,
+          newTier: tier,
+          planId,
+          subscriptionId,
+          source: 'clerk_webhook'
+        });
+      }
 
       // Update user subscription data
       const updateData = {
@@ -173,10 +222,15 @@ async function handleUserUpdated(userData: Record<string, unknown>) {
 
       await adminDb.collection('users').doc(userId).update(updateData);
 
-      console.log('✅ Subscription updated via user.updated webhook:', userId, {
+      console.log(`✅ [${timestamp}] Subscription updated via secure webhook:`, userId, {
         tier,
         maxMissions,
-        status
+        status,
+        planId,
+        subscriptionId,
+        source: planId ? 'planId' : 'metadata',
+        previousTier: currentTier,
+        tierChanged: currentTier !== tier
       });
     } else {
       // Update basic user info
@@ -235,3 +289,5 @@ async function handleUserDeleted(userData: Record<string, unknown>) {
     console.error('❌ Error handling user.deleted:', error);
   }
 }
+
+
