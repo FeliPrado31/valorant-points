@@ -66,6 +66,12 @@ export interface User {
     lastRefresh: Date;
     nextRefresh: Date;
   };
+  // Daily mission selection
+  dailyMissions?: {
+    selectedMissionIds: string[];
+    lastRefresh: Date;
+    nextRefresh: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -122,6 +128,8 @@ export {
   getSubscriptionTier,
   getMaxActiveMissions,
   shouldRefreshMissionSlots,
+  shouldRefreshDailyMissions,
+  generateDailyMissionSelection,
   getTierFromClerkPlanId,
   getClerkPlanIdFromTier,
   type SubscriptionTierKey

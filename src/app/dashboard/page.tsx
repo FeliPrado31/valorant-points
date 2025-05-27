@@ -63,6 +63,12 @@ function DashboardContent() {
   const [refreshing, setRefreshing] = useState(false);
   const [matchesLoading, setMatchesLoading] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [dailyMissionsData, setDailyMissionsData] = useState<{
+    missions: Mission[];
+    tier: 'free' | 'standard' | 'premium';
+    maxMissions: number;
+    isLimited: boolean;
+  } | null>(null);
 
   // Mission filtering
   const { filters, updateFilter, clearFilters } = useMissionFilters();
@@ -84,15 +90,15 @@ function DashboardContent() {
   const fetchData = useCallback(async () => {
     console.log('🔍 Dashboard: Starting fetchData()');
     try {
-      const [userMissionsRes, missionsRes, userRes] = await Promise.all([
+      const [userMissionsRes, dailyMissionsRes, userRes] = await Promise.all([
         fetch('/api/user-missions'),
-        fetch('/api/missions'),
+        fetch('/api/daily-missions'),
         fetch('/api/users')
       ]);
 
       console.log('📊 Dashboard: API responses received', {
         userMissions: userMissionsRes.status,
-        missions: missionsRes.status,
+        dailyMissions: dailyMissionsRes.status,
         user: userRes.status
       });
 
@@ -102,10 +108,16 @@ function DashboardContent() {
         console.log('✅ Dashboard: User missions loaded', userMissionsData.length);
       }
 
-      if (missionsRes.ok) {
-        const missionsData = await missionsRes.json();
-        setAvailableMissions(missionsData);
-        console.log('✅ Dashboard: Available missions loaded', missionsData.length);
+      if (dailyMissionsRes.ok) {
+        const dailyMissionsData = await dailyMissionsRes.json();
+        setDailyMissionsData(dailyMissionsData);
+        setAvailableMissions(dailyMissionsData.missions);
+        console.log('✅ Dashboard: Daily missions loaded', {
+          count: dailyMissionsData.missions.length,
+          tier: dailyMissionsData.tier,
+          maxMissions: dailyMissionsData.maxMissions,
+          isLimited: dailyMissionsData.isLimited
+        });
       }
 
       if (userRes.ok) {
@@ -229,7 +241,7 @@ function DashboardContent() {
       });
 
       if (response.ok) {
-        await fetchData();
+        await fetchData(); // This will refresh both user missions and daily missions
       } else {
         const errorData = await response.json();
 
@@ -484,6 +496,8 @@ function DashboardContent() {
           onClearFilters={clearFilters}
           resultCount={availableFilteredMissions.length}
           totalCount={availableMissions.length}
+          subscriptionTier={dailyMissionsData?.tier || 'free'}
+          isLimitedSelection={dailyMissionsData?.isLimited || false}
         />
 
         {/* Available Missions */}

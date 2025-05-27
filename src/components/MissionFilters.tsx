@@ -15,6 +15,8 @@ interface MissionFiltersProps {
   onClearFilters: () => void;
   resultCount: number;
   totalCount: number;
+  subscriptionTier?: 'free' | 'standard' | 'premium';
+  isLimitedSelection?: boolean;
 }
 
 export default function MissionFiltersComponent({
@@ -23,108 +25,135 @@ export default function MissionFiltersComponent({
   onClearFilters,
   resultCount,
   totalCount,
+  subscriptionTier = 'free',
+  isLimitedSelection = false,
 }: MissionFiltersProps) {
   const hasFilters = hasActiveFilters(filters);
+
+  // Show search and filters only for Premium tier (10 missions) when it's a limited selection
+  const showSearchAndFilters = subscriptionTier === 'premium' && isLimitedSelection;
+
+  // Don't render the component at all for limited selections with small counts (Free/Standard)
+  if (isLimitedSelection && (subscriptionTier === 'free' || subscriptionTier === 'standard')) {
+    return null;
+  }
 
   return (
     <Card className="bg-slate-800/50 border-slate-700 mb-6">
       <CardContent className="p-4 sm:p-6">
-        {/* Search Input */}
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search missions..."
-              value={filters.search}
-              onChange={(e) => onFilterChange('search', e.target.value)}
-              className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
-            />
+        {/* Search Input - Only show for Premium tier */}
+        {showSearchAndFilters && (
+          <div className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search missions..."
+                value={filters.search}
+                onChange={(e) => onFilterChange('search', e.target.value)}
+                className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Filter Controls */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          {/* Difficulty Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Difficulty</label>
-            <Select
-              value={filters.difficulty}
-              onValueChange={(value) => onFilterChange('difficulty', value as MissionFilters['difficulty'])}
-            >
-              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                {FILTER_OPTIONS.difficulty.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Filter Controls - Only show for Premium tier */}
+        {showSearchAndFilters && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            {/* Difficulty Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">Difficulty</label>
+              <Select
+                value={filters.difficulty}
+                onValueChange={(value) => onFilterChange('difficulty', value as MissionFilters['difficulty'])}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  {FILTER_OPTIONS.difficulty.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Type Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Type</label>
-            <Select
-              value={filters.type}
-              onValueChange={(value) => onFilterChange('type', value as MissionFilters['type'])}
-            >
-              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                {FILTER_OPTIONS.type.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Type Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">Type</label>
+              <Select
+                value={filters.type}
+                onValueChange={(value) => onFilterChange('type', value as MissionFilters['type'])}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  {FILTER_OPTIONS.type.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Status Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Status</label>
-            <Select
-              value={filters.status}
-              onValueChange={(value) => onFilterChange('status', value as MissionFilters['status'])}
-            >
-              <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-600">
-                {FILTER_OPTIONS.status.map((option) => (
-                  <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Status Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">Status</label>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => onFilterChange('status', value as MissionFilters['status'])}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-600">
+                  {FILTER_OPTIONS.status.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Clear Filters Button */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300 opacity-0">Clear</label>
-            <Button
-              onClick={onClearFilters}
-              disabled={!hasFilters}
-              variant="outline"
-              className="w-full bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear Filters
-            </Button>
+            {/* Clear Filters Button */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300 opacity-0">Clear</label>
+              <Button
+                onClick={onClearFilters}
+                disabled={!hasFilters}
+                variant="outline"
+                className="w-full bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Results Count and Active Filters */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="text-sm text-gray-300">
-            Showing <span className="font-semibold text-white">{resultCount}</span> of{' '}
-            <span className="font-semibold text-white">{totalCount}</span> missions
-          </div>
+          {/* Only show count for non-limited selections or when filters are applied */}
+          {(!isLimitedSelection || hasFilters) && (
+            <div className="text-sm text-gray-300">
+              {isLimitedSelection ? (
+                // For limited selections, just show the count without "of X total"
+                <span>
+                  <span className="font-semibold text-white">{resultCount}</span> daily missions
+                </span>
+              ) : (
+                // For unlimited selections, show the full count
+                <span>
+                  Showing <span className="font-semibold text-white">{resultCount}</span> of{' '}
+                  <span className="font-semibold text-white">{totalCount}</span> missions
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Active Filters Display */}
           {hasFilters && (

@@ -91,3 +91,80 @@ export const getTierFromClerkPlanId = (planId: string): SubscriptionTierKey => {
 export const getClerkPlanIdFromTier = (tier: SubscriptionTierKey): string | null => {
   return SUBSCRIPTION_TIERS[tier].clerkPlanId;
 };
+
+// Check if daily missions need refresh
+export const shouldRefreshDailyMissions = (user: Record<string, unknown>): boolean => {
+  const dailyMissions = user?.dailyMissions as { lastRefresh?: unknown } | undefined;
+  if (!dailyMissions?.lastRefresh) return true;
+
+  const now = new Date();
+  let lastRefresh: Date;
+
+  // Handle different date formats: Firestore Timestamp, Date object, or string
+  const lastRefreshValue = dailyMissions.lastRefresh;
+  if (lastRefreshValue && typeof lastRefreshValue === 'object' && 'toDate' in lastRefreshValue && typeof (lastRefreshValue as { toDate: () => Date }).toDate === 'function') {
+    // Firestore Timestamp
+    lastRefresh = (lastRefreshValue as { toDate: () => Date }).toDate();
+  } else if (lastRefreshValue instanceof Date) {
+    // Already a Date object
+    lastRefresh = lastRefreshValue;
+  } else {
+    // String or other format
+    lastRefresh = new Date(lastRefreshValue as string);
+  }
+
+  // Validate the date
+  if (isNaN(lastRefresh.getTime())) {
+    console.warn('Invalid lastRefresh date for daily missions, forcing refresh');
+    return true;
+  }
+
+  const hoursSinceRefresh = (now.getTime() - lastRefresh.getTime()) / (1000 * 60 * 60);
+  return hoursSinceRefresh >= 24;
+};
+
+// Generate deterministic random selection of missions based on user ID and date
+export const generateDailyMissionSelection = (
+  allMissions: Array<{ id: string }>,
+  userId: string,
+  maxMissions: number
+): string[] => {
+  if (allMissions.length <= maxMissions) {
+    return allMissions.map(m => m.id);
+  }
+
+  // Create a deterministic seed based on user ID and current date (YYYY-MM-DD)
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const seedString = `${userId}-${today}`;
+
+  // Simple hash function to convert string to number
+  let hash = 0;
+  for (let i = 0; i < seedString.length; i++) {
+    const char = seedString.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+
+  // Use the hash as seed for deterministic randomization
+  const seed = Math.abs(hash);
+
+  // Fisher-Yates shuffle with deterministic random
+  const missions = [...allMissions];
+  let currentIndex = missions.length;
+  let randomIndex: number;
+
+  // Simple linear congruential generator for deterministic randomness
+  let rng = seed;
+  const nextRandom = () => {
+    rng = (rng * 1664525 + 1013904223) % 4294967296;
+    return rng / 4294967296;
+  };
+
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(nextRandom() * currentIndex);
+    currentIndex--;
+    [missions[currentIndex], missions[randomIndex]] = [missions[randomIndex], missions[currentIndex]];
+  }
+
+  return missions.slice(0, maxMissions).map(m => m.id);
+};
