@@ -127,14 +127,16 @@ export const shouldRefreshDailyMissions = (user: Record<string, unknown>): boole
 export const generateDailyMissionSelection = (
   allMissions: Array<{ id: string }>,
   userId: string,
-  maxMissions: number
+  maxMissions: number,
+  dateOverride?: string // Optional date override for testing/consistency
 ): string[] => {
   if (allMissions.length <= maxMissions) {
     return allMissions.map(m => m.id);
   }
 
   // Create a deterministic seed based on user ID and current date (YYYY-MM-DD)
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  // Use UTC to ensure consistency across timezones
+  const today = dateOverride || new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
   const seedString = `${userId}-${today}`;
 
   // Simple hash function to convert string to number
