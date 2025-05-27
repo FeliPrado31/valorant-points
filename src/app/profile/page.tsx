@@ -172,12 +172,21 @@ export default function Profile() {
               <h3 className="text-lg font-semibold text-white">Basic Information</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">Username</Label>
+                <Label htmlFor="username" className="text-white">
+                  Username
+                  {profile && <span className="text-xs text-gray-400 ml-2">(Immutable)</span>}
+                </Label>
                 <Input
                   id="username"
                   value={formData.username}
-                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                  className="bg-slate-700 border-slate-600 text-white"
+                  onChange={(e) => {
+                    // Only allow username changes for new users (no existing profile)
+                    if (!profile) {
+                      setFormData(prev => ({ ...prev, username: e.target.value }));
+                    }
+                  }}
+                  disabled={!!profile}
+                  className={`${profile ? 'bg-slate-600 border-slate-500 text-gray-300 cursor-not-allowed' : 'bg-slate-700 border-slate-600 text-white'}`}
                   placeholder="Enter your username"
                 />
               </div>
@@ -277,13 +286,20 @@ export default function Profile() {
             <div className="pt-4">
               <Button
                 onClick={saveProfile}
-                disabled={saving || !formData.username}
+                disabled={saving || !formData.username || (!!profile && riotIdLinked)}
                 size="lg"
-                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                className="w-full bg-red-600 hover:bg-red-700 text-white disabled:bg-gray-600 disabled:cursor-not-allowed"
               >
                 <Save className={`h-4 w-4 mr-2 ${saving ? 'animate-spin' : ''}`} />
-                Save Profile
+                {saving ? 'Saving...' : 'Save Profile'}
               </Button>
+
+              {/* Show message when save is disabled due to verified Riot ID */}
+              {profile && riotIdLinked && (
+                <div className="text-center text-gray-400 text-sm mt-2">
+                  Profile cannot be modified once Riot ID is verified and linked.
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

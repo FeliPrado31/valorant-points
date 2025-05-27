@@ -15,6 +15,7 @@ export default function Setup() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
     valorantName: '',
@@ -24,14 +25,37 @@ export default function Setup() {
   const [playerData, setPlayerData] = useState<{ name: string; tag: string; accountLevel: number; region: string; lastUpdate: string; card: { wide: string; large: string } } | null>(null);
   const [error, setError] = useState('');
 
+  // Check if user already has a Riot ID and redirect if they do
   useEffect(() => {
+    const checkUserAccess = async () => {
+      if (!user) return;
+
+      try {
+        const response = await fetch('/api/users');
+        if (response.ok) {
+          const userData = await response.json();
+          // If user already has a Riot ID, redirect to dashboard
+          if (userData.riotId && userData.riotId.puuid) {
+            console.log('🔒 Setup: User already has Riot ID, redirecting to dashboard');
+            router.push('/dashboard');
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user access:', error);
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
     if (user) {
+      checkUserAccess();
       setFormData(prev => ({
         ...prev,
         username: user.username || user.firstName || '',
       }));
     }
-  }, [user]);
+  }, [user, router]);
 
   const verifyValorantPlayer = async () => {
     if (!formData.valorantName || !formData.valorantTag) {
@@ -115,6 +139,15 @@ export default function Setup() {
       setLoading(false);
     }
   };
+
+  // Show loading while checking access
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Checking access...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">

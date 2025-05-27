@@ -106,9 +106,12 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date(),
     };
 
-    // Allow username updates
-    if (username) {
-      updateData.username = username;
+    // Username is immutable once set - do not allow updates
+    // This prevents users from changing their username after initial setup
+    if (username && username !== currentUserData.username) {
+      return NextResponse.json({
+        error: 'Username cannot be changed once set. Contact support if you need to update it.'
+      }, { status: 403 });
     }
 
     // Only allow valorantTag updates if Riot ID is not set
