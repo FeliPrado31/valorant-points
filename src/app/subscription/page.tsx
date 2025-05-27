@@ -34,6 +34,7 @@ export default function SubscriptionPage() {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPricingTable, setShowPricingTable] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchSubscriptionInfo();
@@ -50,6 +51,40 @@ export default function SubscriptionPage() {
       console.error('Error fetching subscription info:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const manualUpdateToPremium = async () => {
+    setUpdating(true);
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tier: 'premium',
+          planId: 'cplan_2xb4qlrucukzKqSlMKtE7pvJdq9',
+          clerkSubscriptionId: 'sub_test_premium_manual'
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Subscription updated:', result);
+        // Refresh the subscription info
+        await fetchSubscriptionInfo();
+        alert('Successfully updated to Premium plan!');
+      } else {
+        const error = await response.text();
+        console.error('Failed to update subscription:', error);
+        alert('Failed to update subscription: ' + error);
+      }
+    } catch (error) {
+      console.error('Error updating subscription:', error);
+      alert('Error updating subscription: ' + error);
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -221,6 +256,32 @@ export default function SubscriptionPage() {
                       className="text-white border-slate-600 hover:bg-slate-800"
                     >
                       Hide Pricing
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Manual Update for Testing (Development Only) */}
+            {process.env.NODE_ENV === 'development' && subscriptionInfo.tier === 'free' && (
+              <Card className="bg-orange-800/20 border-orange-600 mb-8">
+                <CardHeader>
+                  <CardTitle className="text-orange-400">Development Testing</CardTitle>
+                  <CardDescription className="text-orange-300">
+                    Manual subscription update for testing webhook functionality
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center">
+                    <p className="text-orange-200 mb-4">
+                      This button simulates what should happen when a webhook is received after subscription purchase.
+                    </p>
+                    <Button
+                      onClick={manualUpdateToPremium}
+                      disabled={updating}
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                    >
+                      {updating ? 'Updating...' : 'Manually Update to Premium (Test)'}
                     </Button>
                   </div>
                 </CardContent>
