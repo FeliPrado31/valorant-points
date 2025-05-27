@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { 
-  adminDb, 
-  Mission, 
-  User, 
-  getSubscriptionTier, 
-  getMaxActiveMissions, 
+import {
+  adminDb,
+  Mission,
+  User,
+  getSubscriptionTier,
+  getMaxActiveMissions,
   shouldRefreshDailyMissions,
   generateDailyMissionSelection
 } from '@/lib/firebase-admin';
@@ -13,14 +13,14 @@ import {
 export async function GET() {
   try {
     const { userId } = await auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user document
     const userDoc = await adminDb.collection('users').doc(userId).get();
-    
+
     if (!userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -46,7 +46,7 @@ export async function GET() {
       };
 
       await adminDb.collection('users').doc(userId).update(initializationData);
-      
+
       // Refresh user data
       const updatedUserDoc = await adminDb.collection('users').doc(userId).get();
       userData = updatedUserDoc.data() as User;
@@ -101,7 +101,7 @@ export async function GET() {
     }
 
     // Filter missions to only include selected daily missions
-    const dailyMissions = allMissions.filter(mission => 
+    const dailyMissions = allMissions.filter(mission =>
       selectedMissionIds.includes(mission.id)
     );
 
@@ -110,11 +110,11 @@ export async function GET() {
       const difficultyOrder = { 'easy': 1, 'medium': 2, 'hard': 3 };
       const aDiff = difficultyOrder[a.difficulty];
       const bDiff = difficultyOrder[b.difficulty];
-      
+
       if (aDiff !== bDiff) {
         return aDiff - bDiff;
       }
-      
+
       // If same difficulty, sort by creation date (newest first)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
