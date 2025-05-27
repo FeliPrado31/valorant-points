@@ -198,7 +198,20 @@ async function updateMissionProgress(userId: string, matchData: ValorantMatch) {
         progressIncrement = matchData.headshots;
         break;
       case 'gamemode':
-        if (matchData.gameMode.toLowerCase().includes(mission.description.toLowerCase())) {
+        // Extract the key game mode from mission description (e.g., "Deathmatch" from "Play 5 Deathmatch games")
+        const missionGameMode = mission.description.toLowerCase().match(/\b(deathmatch|competitive|unrated|spike rush|escalation|replication|snowball fight)\b/)?.[0];
+        const actualGameMode = matchData.gameMode.toLowerCase();
+
+        console.log(`🎮 Game mode matching:`, {
+          missionDescription: mission.description,
+          extractedGameMode: missionGameMode,
+          actualGameMode: actualGameMode,
+          matches: missionGameMode && actualGameMode.includes(missionGameMode)
+        });
+
+        // Check if the actual game mode contains the mission's target game mode
+        // This handles cases like "Team Deathmatch" matching "Deathmatch"
+        if (missionGameMode && actualGameMode.includes(missionGameMode)) {
           progressIncrement = 1;
         }
         break;
@@ -215,6 +228,8 @@ async function updateMissionProgress(userId: string, matchData: ValorantMatch) {
     console.log(`📊 Mission progress calculation:`, {
       missionType: mission.type,
       missionTitle: mission.title,
+      missionDescription: mission.description,
+      matchGameMode: matchData.gameMode,
       progressIncrement,
       currentProgress: userMission.progress,
       target: mission.target
