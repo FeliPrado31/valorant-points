@@ -1,5 +1,36 @@
 {
   "_namespace": "missions",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil"
+  },
+  "types": {
+    "kills": "Eliminaciones",
+    "headshots": "Disparos a la cabeza",
+    "gamemode": "Modo de juego",
+    "weapon": "Arma",
+    "rounds": "Rondas",
+    "wins": "Victorias"
+  },
+  "status": {
+    "available": "Disponible",
+    "active": "Activa",
+    "completed": "Completada",
+    "expired": "Expirada"
+  },
+  "filters": {
+    "searchPlaceholder": "Buscar misiones...",
+    "filterBy": "Filtrar por",
+    "difficulty": "Dificultad",
+    "type": "Tipo",
+    "status": "Estado",
+    "clearFilters": "Limpiar filtros",
+    "showingResults": "Mostrando {{count}} de {{total}} misiones",
+    "noResults": "No se encontraron misiones que coincidan con tus filtros",
+    "upgradeForFilters": {
+      "free": "Mejora a Estándar o Premium para acceder a filtros de misiones y búsqueda.",
+      "standard": "Mejora a Premium para acceder a filtros avanzados de misiones y búsqueda."
+    }
+  }
 }

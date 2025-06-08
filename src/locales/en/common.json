@@ -1,5 +1,9 @@
 {
   "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "labels": {
+    "all": "All",
+    "note": "Note",
+    "features": "Features",
+    "search": "Search"
+  }
 }

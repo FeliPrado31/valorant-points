@@ -1,5 +1,9 @@
 {
   "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "labels": {
+    "all": "Todos",
+    "note": "Nota",
+    "features": "Características",
+    "search": "Búsqueda"
+  }
 }

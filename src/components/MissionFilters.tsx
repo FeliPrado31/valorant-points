@@ -8,10 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Search, X, Filter } from 'lucide-react';
 import { MissionFilters } from '@/lib/utils';
 import { FILTER_OPTIONS, hasActiveFilters } from '@/lib/mission-utils';
+import {
+  useMissionsTranslations,
+  useCommonTranslations
+} from '@/hooks/useI18n';
 
 interface MissionFiltersProps {
   filters: MissionFilters;
-  onFilterChange: <K extends keyof MissionFilters>(key: K, value: MissionFilters[K]) => void;
+  onFilterChange: (key: keyof MissionFilters, value: string) => void;
   onClearFilters: () => void;
   resultCount: number;
   totalCount: number;
@@ -28,7 +32,26 @@ export default function MissionFiltersComponent({
   subscriptionTier = 'free',
   isLimitedSelection = false,
 }: MissionFiltersProps) {
+  const t = useMissionsTranslations();
+  const common = useCommonTranslations();
   const hasFilters = hasActiveFilters(filters);
+
+  // Get translated filter options
+  const getTranslatedDifficultyOptions = () => {
+    return FILTER_OPTIONS.difficulty.map(option => ({
+      value: option.value,
+      label: option.value === 'all' ? common('labels.all') : t(`difficulty.${option.value}`)
+    }));
+  };
+
+  const getTranslatedTypeOptions = () => {
+    return FILTER_OPTIONS.type.map(option => ({
+      value: option.value,
+      label: option.value === 'all' ? common('labels.all') : t(`types.${option.value}`)
+    }));
+  };
+
+
 
   // Show search and filters only for Premium tier (10 missions) when it's a limited selection
   const showSearchAndFilters = subscriptionTier === 'premium' && isLimitedSelection;
@@ -47,7 +70,7 @@ export default function MissionFiltersComponent({
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search missions..."
+                placeholder={t('filters.searchPlaceholder')}
                 value={filters.search}
                 onChange={(e) => onFilterChange('search', e.target.value)}
                 className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
@@ -56,135 +79,172 @@ export default function MissionFiltersComponent({
           </div>
         )}
 
-        {/* Filter Controls - Only show for Premium tier */}
-        {showSearchAndFilters && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            {/* Difficulty Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Difficulty</label>
+        {/* Filter Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Filter Dropdowns - Only show for Premium tier or when not limited */}
+          {(showSearchAndFilters || !isLimitedSelection) && (
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-400" />
+                <span className="text-sm text-gray-300 whitespace-nowrap">
+                  {t('filters.filterBy')}:
+                </span>
+              </div>
+
+              {/* Difficulty Filter */}
               <Select
                 value={filters.difficulty}
-                onValueChange={(value) => onFilterChange('difficulty', value as MissionFilters['difficulty'])}
+                onValueChange={(value) => onFilterChange('difficulty', value)}
               >
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue />
+                <SelectTrigger className="w-full sm:w-[140px] bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue placeholder={t('filters.difficulty')} />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  {FILTER_OPTIONS.difficulty.map((option) => (
-                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  {getTranslatedDifficultyOptions().map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      className="text-white hover:bg-slate-700 focus:bg-slate-700"
+                    >
                       {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
 
-            {/* Type Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Type</label>
+              {/* Type Filter */}
               <Select
                 value={filters.type}
-                onValueChange={(value) => onFilterChange('type', value as MissionFilters['type'])}
+                onValueChange={(value) => onFilterChange('type', value)}
               >
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue />
+                <SelectTrigger className="w-full sm:w-[140px] bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue placeholder={t('filters.type')} />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  {FILTER_OPTIONS.type.map((option) => (
-                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  {getTranslatedTypeOptions().map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      className="text-white hover:bg-slate-700 focus:bg-slate-700"
+                    >
                       {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+          )}
 
-            {/* Status Filter */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Status</label>
-              <Select
-                value={filters.status}
-                onValueChange={(value) => onFilterChange('status', value as MissionFilters['status'])}
-              >
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  {FILTER_OPTIONS.status.map((option) => (
-                    <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Results Count and Clear Filters */}
+          <div className="flex items-center space-x-3">
+            {/* Results Count */}
+            <div className="text-sm text-gray-300">
+              {resultCount === totalCount ? (
+                <span>
+                  {t('filters.showingResults', { count: totalCount, total: totalCount })}
+                </span>
+              ) : (
+                <span>
+                  {t('filters.showingResults', { count: resultCount, total: totalCount })}
+                </span>
+              )}
             </div>
 
             {/* Clear Filters Button */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300 opacity-0">Clear</label>
+            {hasFilters && (
               <Button
                 onClick={onClearFilters}
-                disabled={!hasFilters}
-                variant="outline"
-                className="w-full bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600 disabled:opacity-50"
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white hover:bg-slate-700"
               >
-                <X className="h-4 w-4 mr-2" />
-                Clear Filters
+                <X className="h-4 w-4 mr-1" />
+                {t('filters.clearFilters')}
               </Button>
-            </div>
+            )}
+          </div>
+        </div>
+
+        {/* Active Filters Display */}
+        {hasFilters && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {filters.search && (
+              <Badge variant="secondary" className="bg-slate-700 text-white">
+                {common('labels.search')}: &quot;{filters.search}&quot;
+                <button
+                  onClick={() => onFilterChange('search', '')}
+                  className="ml-2 hover:text-red-400"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.difficulty !== 'all' && (
+              <Badge variant="secondary" className="bg-slate-700 text-white">
+                {t('filters.difficulty')}: {t(`difficulty.${filters.difficulty}`)}
+                <button
+                  onClick={() => onFilterChange('difficulty', 'all')}
+                  className="ml-2 hover:text-red-400"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.type !== 'all' && (
+              <Badge variant="secondary" className="bg-slate-700 text-white">
+                {t('filters.type')}: {t(`types.${filters.type}`)}
+                <button
+                  onClick={() => onFilterChange('type', 'all')}
+                  className="ml-2 hover:text-red-400"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {filters.status !== 'all' && (
+              <Badge variant="secondary" className="bg-slate-700 text-white">
+                {t('filters.status')}: {t(`status.${filters.status}`)}
+                <button
+                  onClick={() => onFilterChange('status', 'all')}
+                  className="ml-2 hover:text-red-400"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
           </div>
         )}
 
-        {/* Results Count and Active Filters */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Only show count for non-limited selections or when filters are applied */}
-          {(!isLimitedSelection || hasFilters) && (
-            <div className="text-sm text-gray-300">
-              {isLimitedSelection ? (
-                // For limited selections, just show the count without "of X total"
-                <span>
-                  <span className="font-semibold text-white">{resultCount}</span> daily missions
-                </span>
-              ) : (
-                // For unlimited selections, show the full count
-                <span>
-                  Showing <span className="font-semibold text-white">{resultCount}</span> of{' '}
-                  <span className="font-semibold text-white">{totalCount}</span> missions
-                </span>
-              )}
-            </div>
-          )}
+        {/* No Results Message */}
+        {resultCount === 0 && hasFilters && (
+          <div className="mt-4 text-center py-8">
+            <div className="text-gray-400 mb-2">{t('filters.noResults')}</div>
+            <Button
+              onClick={onClearFilters}
+              variant="outline"
+              size="sm"
+              className="border-gray-600 text-gray-300 hover:bg-slate-700"
+            >
+              {t('filters.clearFilters')}
+            </Button>
+          </div>
+        )}
 
-          {/* Active Filters Display */}
-          {hasFilters && (
-            <div className="flex flex-wrap gap-2">
-              {filters.search && (
-                <Badge variant="secondary" className="bg-red-600/20 text-red-300 border-red-600/30">
-                  <Search className="h-3 w-3 mr-1" />
-                  &quot;{filters.search}&quot;
-                </Badge>
-              )}
-              {filters.difficulty !== 'all' && (
-                <Badge variant="secondary" className="bg-blue-600/20 text-blue-300 border-blue-600/30">
-                  <Filter className="h-3 w-3 mr-1" />
-                  {filters.difficulty}
-                </Badge>
-              )}
-              {filters.type !== 'all' && (
-                <Badge variant="secondary" className="bg-green-600/20 text-green-300 border-green-600/30">
-                  <Filter className="h-3 w-3 mr-1" />
-                  {filters.type}
-                </Badge>
-              )}
-              {filters.status !== 'all' && (
-                <Badge variant="secondary" className="bg-purple-600/20 text-purple-300 border-purple-600/30">
-                  <Filter className="h-3 w-3 mr-1" />
-                  {filters.status}
-                </Badge>
-              )}
+        {/* Subscription Tier Notice for Limited Selections */}
+        {isLimitedSelection && subscriptionTier !== 'premium' && (
+          <div className="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+            <div className="text-blue-300 text-sm">
+              <strong>{common('labels.note')}:</strong> {
+                subscriptionTier === 'free'
+                  ? t('filters.upgradeForFilters.free')
+                  : t('filters.upgradeForFilters.standard')
+              }
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
