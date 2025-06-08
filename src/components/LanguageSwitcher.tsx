@@ -20,32 +20,24 @@ export default function LanguageSwitcher({
   const currentLocale = useLocale() as Locale;
   const [isChanging, setIsChanging] = useState(false);
 
-  console.log('🌐 LanguageSwitcher: Current locale:', currentLocale);
-  console.log('🌐 LanguageSwitcher: Current pathname:', pathname);
-
   const handleLocaleChange = async (newLocale: string) => {
     if (newLocale === currentLocale || isChanging) {
-      console.log('🌐 LanguageSwitcher: Change blocked - same locale or already changing');
       return;
     }
 
     setIsChanging(true);
-    console.log('🌐 LanguageSwitcher: Changing locale from', currentLocale, 'to', newLocale);
 
     try {
       // 1. Set the preferred locale in cookie
       document.cookie = `preferred-locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
-      console.log('🌐 LanguageSwitcher: Set preferred locale cookie:', newLocale);
 
       // 2. Create new path with the new locale
       const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
       const newPath = `/${newLocale}${pathWithoutLocale}`;
-      console.log('🌐 LanguageSwitcher: Navigating to:', newPath);
 
       // 3. Use window.location for a complete page reload to ensure proper locale switching
       window.location.href = newPath;
-    } catch (error) {
-      console.error('❌ LanguageSwitcher: Error changing locale:', error);
+    } catch {
       setIsChanging(false);
     }
   };

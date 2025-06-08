@@ -20,14 +20,12 @@ function getLocaleFromRequest(request: NextRequest): string {
   );
 
   if (pathnameLocale) {
-    console.log('🌐 Middleware: Found locale in URL:', pathnameLocale);
     return pathnameLocale;
   }
 
   // 2. Check for preferred locale in cookies
   const preferredLocale = request.cookies.get('preferred-locale')?.value;
   if (preferredLocale && locales.includes(preferredLocale as any)) {
-    console.log('🌐 Middleware: Found preferred locale in cookie:', preferredLocale);
     return preferredLocale;
   }
 
@@ -39,19 +37,12 @@ function getLocaleFromRequest(request: NextRequest): string {
       .map(lang => lang.split(';')[0].trim().toLowerCase());
 
     for (const browserLocale of browserLocales) {
-      if (browserLocale.startsWith('es')) {
-        console.log('🌐 Middleware: Detected Spanish from browser');
-        return 'es';
-      }
-      if (browserLocale.startsWith('en')) {
-        console.log('🌐 Middleware: Detected English from browser');
-        return 'en';
-      }
+      if (browserLocale.startsWith('es')) return 'es';
+      if (browserLocale.startsWith('en')) return 'en';
     }
   }
 
   // 4. Default fallback
-  console.log('🌐 Middleware: Using default locale:', defaultLocale);
   return defaultLocale;
 }
 
@@ -66,8 +57,6 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  console.log('🌐 Middleware: Processing request for:', pathname);
-
   // Check if pathname already has a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
@@ -77,7 +66,6 @@ export default clerkMiddleware(async (auth, req) => {
   if (!pathnameHasLocale) {
     const detectedLocale = getLocaleFromRequest(req);
     const newUrl = new URL(`/${detectedLocale}${pathname}`, req.url);
-    console.log('🌐 Middleware: Redirecting to:', newUrl.pathname);
 
     const response = NextResponse.redirect(newUrl);
     // Set the locale in a header for the next request
@@ -87,7 +75,6 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Extract locale from pathname
   const locale = pathname.split('/')[1];
-  console.log('🌐 Middleware: Current locale:', locale);
 
   // For protected routes, require authentication
   if (isProtectedRoute(req)) {

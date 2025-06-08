@@ -14,16 +14,8 @@ export default getRequestConfig(async ({ locale }) => {
 
   if (locale && validLocales.includes(locale)) {
     actualLocale = locale;
-    console.log('🌐 i18n.ts: Using locale from parameter:', actualLocale);
   } else if (middlewareLocale && validLocales.includes(middlewareLocale)) {
     actualLocale = middlewareLocale;
-    console.log('🌐 i18n.ts: Using locale from middleware header:', actualLocale);
-  } else {
-    console.warn('⚠️ i18n.ts: No valid locale found, using default:', {
-      localeParam: locale,
-      middlewareLocale,
-      using: actualLocale
-    });
   }
 
   try {
@@ -38,14 +30,11 @@ export default getRequestConfig(async ({ locale }) => {
       errors: (await import(`./locales/${actualLocale}/errors.json`)).default
     };
 
-    console.log('✅ i18n.ts: Successfully loaded messages for locale:', actualLocale);
-
     return {
       locale: actualLocale,
       messages
     };
   } catch (error) {
-    console.error('❌ i18n.ts: Error loading messages for locale:', actualLocale, error);
 
     // Fallback to Spanish if there's any error
     const fallbackMessages = {
@@ -58,8 +47,6 @@ export default getRequestConfig(async ({ locale }) => {
       missions: (await import(`./locales/es/missions.json`)).default,
       errors: (await import(`./locales/es/errors.json`)).default
     };
-
-    console.log('🔄 i18n.ts: Using fallback messages (Spanish)');
 
     return {
       locale: 'es',
