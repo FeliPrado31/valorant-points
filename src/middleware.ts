@@ -17,14 +17,19 @@ const isProtectedRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
+  // Handle i18n routing first for all non-API routes
+  if (!req.nextUrl.pathname.startsWith('/api/')) {
+    const i18nResponse = handleI18nRouting(req);
+
+    // If i18n middleware returns a response (redirect), use it
+    if (i18nResponse) {
+      return i18nResponse;
+    }
+  }
+
   // For protected routes, require authentication
   if (isProtectedRoute(req)) {
     await auth.protect();
-  }
-
-  // For non-API routes, handle i18n routing
-  if (!req.nextUrl.pathname.startsWith('/api/')) {
-    return handleI18nRouting(req);
   }
 })
 

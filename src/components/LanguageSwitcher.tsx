@@ -28,24 +28,37 @@ export default function LanguageSwitcher({
   const currentLocale = useLocale();
   const [isChanging, setIsChanging] = useState(false);
 
+  console.log('🌐 LanguageSwitcher: Current locale:', currentLocale);
+  console.log('🌐 LanguageSwitcher: Current pathname:', pathname);
+  console.log('🌐 LanguageSwitcher: Available locales:', locales);
+
   const handleLocaleChange = async (newLocale: string) => {
-    if (newLocale === currentLocale || isChanging) return;
-    
+    console.log('🌐 LanguageSwitcher: Attempting to change locale from', currentLocale, 'to', newLocale);
+    console.log('🌐 LanguageSwitcher: Current pathname:', pathname);
+
+    if (newLocale === currentLocale || isChanging) {
+      console.log('🌐 LanguageSwitcher: Change blocked - same locale or already changing');
+      return;
+    }
+
     setIsChanging(true);
-    
+
     try {
       // Remove current locale from pathname
       const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
-      
+      console.log('🌐 LanguageSwitcher: Path without locale:', pathWithoutLocale);
+
       // Navigate to new locale
       const newPath = `/${newLocale}${pathWithoutLocale}`;
+      console.log('🌐 LanguageSwitcher: Navigating to:', newPath);
       router.push(newPath);
-      
+
       // Store preference
       document.cookie = `preferred-locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
       localStorage.setItem('preferred-locale', newLocale);
+      console.log('🌐 LanguageSwitcher: Preference stored');
     } catch (error) {
-      console.error('Error changing locale:', error);
+      console.error('❌ LanguageSwitcher: Error changing locale:', error);
     } finally {
       // Reset changing state after a delay
       setTimeout(() => setIsChanging(false), 1000);

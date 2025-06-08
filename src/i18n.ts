@@ -1,7 +1,12 @@
 ﻿import { getRequestConfig } from 'next-intl/server';
 
 export default getRequestConfig(async ({ locale }) => {
-  const actualLocale = locale || 'es';
+  // Validate locale and use default if invalid
+  const validLocales = ['en', 'es'];
+  const actualLocale = validLocales.includes(locale) ? locale : 'es';
+
+  console.log('🌐 i18n.ts: Requested locale:', locale);
+  console.log('🌐 i18n.ts: Using actual locale:', actualLocale);
 
   return {
     locale: actualLocale,
