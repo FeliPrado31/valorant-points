@@ -1,16 +1,33 @@
 ﻿import { getRequestConfig } from 'next-intl/server';
+import { headers } from 'next/headers';
 
 export default getRequestConfig(async ({ locale }) => {
-  // Validate locale and use default if invalid
+  // Get locale from middleware headers as backup
+  const headersList = await headers();
+  const middlewareLocale = headersList.get('x-middleware-locale');
+
+  // Validate that the incoming locale parameter is valid
   const validLocales = ['en', 'es'];
-  const actualLocale = validLocales.includes(locale) ? locale : 'es';
 
-  console.log('🌐 i18n.ts: Requested locale:', locale);
-  console.log('🌐 i18n.ts: Using actual locale:', actualLocale);
+  // Priority: 1. locale parameter, 2. middleware header, 3. default
+  let actualLocale = 'es'; // default fallback
 
-  return {
-    locale: actualLocale,
-    messages: {
+  if (locale && validLocales.includes(locale)) {
+    actualLocale = locale;
+    console.log('🌐 i18n.ts: Using locale from parameter:', actualLocale);
+  } else if (middlewareLocale && validLocales.includes(middlewareLocale)) {
+    actualLocale = middlewareLocale;
+    console.log('🌐 i18n.ts: Using locale from middleware header:', actualLocale);
+  } else {
+    console.warn('⚠️ i18n.ts: No valid locale found, using default:', {
+      localeParam: locale,
+      middlewareLocale,
+      using: actualLocale
+    });
+  }
+
+  try {
+    const messages = {
       common: (await import(`./locales/${actualLocale}/common.json`)).default,
       navigation: (await import(`./locales/${actualLocale}/navigation.json`)).default,
       dashboard: (await import(`./locales/${actualLocale}/dashboard.json`)).default,
@@ -19,6 +36,34 @@ export default getRequestConfig(async ({ locale }) => {
       subscription: (await import(`./locales/${actualLocale}/subscription.json`)).default,
       missions: (await import(`./locales/${actualLocale}/missions.json`)).default,
       errors: (await import(`./locales/${actualLocale}/errors.json`)).default
-    }
-  };
+    };
+
+    console.log('✅ i18n.ts: Successfully loaded messages for locale:', actualLocale);
+
+    return {
+      locale: actualLocale,
+      messages
+    };
+  } catch (error) {
+    console.error('❌ i18n.ts: Error loading messages for locale:', actualLocale, error);
+
+    // Fallback to Spanish if there's any error
+    const fallbackMessages = {
+      common: (await import(`./locales/es/common.json`)).default,
+      navigation: (await import(`./locales/es/navigation.json`)).default,
+      dashboard: (await import(`./locales/es/dashboard.json`)).default,
+      profile: (await import(`./locales/es/profile.json`)).default,
+      setup: (await import(`./locales/es/setup.json`)).default,
+      subscription: (await import(`./locales/es/subscription.json`)).default,
+      missions: (await import(`./locales/es/missions.json`)).default,
+      errors: (await import(`./locales/es/errors.json`)).default
+    };
+
+    console.log('🔄 i18n.ts: Using fallback messages (Spanish)');
+
+    return {
+      locale: 'es',
+      messages: fallbackMessages
+    };
+  }
 });

@@ -8,6 +8,12 @@ import { Grid } from '@/components/ui/grid';
 import { Target, Trophy, Users } from 'lucide-react';
 import AutoRedirect from '@/components/AutoRedirect';
 import { getTranslations } from 'next-intl/server';
+import dynamic from 'next/dynamic';
+
+// Dynamically import LanguageSwitcher to ensure it's client-side only
+const LanguageSwitcher = dynamic(() => import('@/components/LanguageSwitcher'), {
+  loading: () => <div className="w-20 h-8 bg-gray-700/20 rounded animate-pulse"></div>
+});
 
 export default async function LocalizedHome({
   params
@@ -36,6 +42,9 @@ export default async function LocalizedHome({
               </span>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Language Switcher */}
+              <LanguageSwitcher variant="button" />
+
               {userId ? (
                 <>
                   <Link href={`/${locale}/dashboard`}>

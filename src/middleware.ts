@@ -1,17 +1,26 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import createMiddleware from 'next-intl/middleware';
+import { NextRequest, NextResponse } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
-import { NextRequest } from 'next/server';
+
+const isProtectedRoute = createRouteMatcher([
+  '/(es|en)/dashboard(.*)',
+  '/(es|en)/missions(.*)',
+  '/(es|en)/leaderboard(.*)',
+  '/(es|en)/subscription(.*)',
+  '/(es|en)/profile(.*)',
+])
 
 // Custom locale detection function
-function getLocale(request: NextRequest): string {
-  // 1. Check if locale is already in the URL
+function getLocaleFromRequest(request: NextRequest): string {
   const pathname = request.nextUrl.pathname;
+
+  // 1. Check if locale is already in the URL
   const pathnameLocale = locales.find(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
   if (pathnameLocale) {
+    console.log('🌐 Middleware: Found locale in URL:', pathnameLocale);
     return pathnameLocale;
   }
 
@@ -30,8 +39,14 @@ function getLocale(request: NextRequest): string {
       .map(lang => lang.split(';')[0].trim().toLowerCase());
 
     for (const browserLocale of browserLocales) {
-      if (browserLocale.startsWith('es')) return 'es';
-      if (browserLocale.startsWith('en')) return 'en';
+      if (browserLocale.startsWith('es')) {
+        console.log('🌐 Middleware: Detected Spanish from browser');
+        return 'es';
+      }
+      if (browserLocale.startsWith('en')) {
+        console.log('🌐 Middleware: Detected English from browser');
+        return 'en';
+      }
     }
   }
 
@@ -40,49 +55,49 @@ function getLocale(request: NextRequest): string {
   return defaultLocale;
 }
 
-const handleI18nRouting = createMiddleware({
-  locales,
-  defaultLocale,
-  localePrefix: 'always',
-  localeDetection: false // Disable automatic detection, we'll handle it manually
-});
-
-const isProtectedRoute = createRouteMatcher([
-  '/(es|en)/dashboard(.*)',
-  '/(es|en)/missions(.*)',
-  '/(es|en)/leaderboard(.*)',
-  '/(es|en)/subscription(.*)',
-  '/(es|en)/profile(.*)',
-])
-
 export default clerkMiddleware(async (auth, req) => {
-  // Handle i18n routing first for all non-API routes
-  if (!req.nextUrl.pathname.startsWith('/api/')) {
-    // Check if we need to redirect to include locale
-    const pathname = req.nextUrl.pathname;
-    const pathnameHasLocale = locales.some(
-      (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-    );
+  const pathname = req.nextUrl.pathname;
 
-    // If no locale in pathname, redirect to include preferred locale
-    if (!pathnameHasLocale) {
-      const detectedLocale = getLocale(req);
-      const newUrl = new URL(`/${detectedLocale}${pathname}`, req.url);
-      console.log('🌐 Middleware: Redirecting to:', newUrl.pathname);
-      return Response.redirect(newUrl);
-    }
-
-    // Let next-intl handle the routing
-    const i18nResponse = handleI18nRouting(req);
-    if (i18nResponse) {
-      return i18nResponse;
-    }
+  // Skip middleware for API routes, static files, and Next.js internals
+  if (pathname.startsWith('/api/') ||
+      pathname.startsWith('/_next/') ||
+      pathname.startsWith('/favicon.ico') ||
+      pathname.includes('.')) {
+    return NextResponse.next();
   }
+
+  console.log('🌐 Middleware: Processing request for:', pathname);
+
+  // Check if pathname already has a locale
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+
+  // If no locale in pathname, redirect to include locale
+  if (!pathnameHasLocale) {
+    const detectedLocale = getLocaleFromRequest(req);
+    const newUrl = new URL(`/${detectedLocale}${pathname}`, req.url);
+    console.log('🌐 Middleware: Redirecting to:', newUrl.pathname);
+
+    const response = NextResponse.redirect(newUrl);
+    // Set the locale in a header for the next request
+    response.headers.set('x-middleware-locale', detectedLocale);
+    return response;
+  }
+
+  // Extract locale from pathname
+  const locale = pathname.split('/')[1];
+  console.log('🌐 Middleware: Current locale:', locale);
 
   // For protected routes, require authentication
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
+
+  // Continue with the request, setting locale in headers
+  const response = NextResponse.next();
+  response.headers.set('x-middleware-locale', locale);
+  return response;
 })
 
 export const config = {
