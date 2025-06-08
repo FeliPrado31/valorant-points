@@ -45,7 +45,9 @@
     "subtotal": "Subtotal",
     "tax": "Impuesto",
     "discount": "Descuento",
-    "features": "Características"
+    "features": "Características",
+    "all": "Todos",
+    "note": "Nota"
   },
   "status": {
     "active": "Activo",
