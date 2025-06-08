@@ -1,5 +1,54 @@
 {
-  "_namespace": "subscription",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "title": "Subscription Management",
+  "description": "Manage your subscription and unlock more missions",
+  "plans": {
+    "free": {
+      "name": "Free",
+      "description": "Basic mission tracking",
+      "features": [
+        "Up to 3 active missions",
+        "Basic progress tracking",
+        "Community support"
+      ]
+    },
+    "standard": {
+      "name": "Standard",
+      "description": "Enhanced mission experience",
+      "features": [
+        "Up to 7 active missions",
+        "Advanced statistics",
+        "Priority support",
+        "Mission filters"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Ultimate mission experience",
+      "features": [
+        "Unlimited active missions",
+        "Advanced analytics",
+        "Premium support",
+        "Early access features"
+      ]
+    }
+  },
+  "status": {
+    "currentPlan": "Current Plan",
+    "dailySlotsUsed": "Daily Slots Used",
+    "dailyLimitReached": "Daily limit reached. Resets in {hours} hours",
+    "upgradeAvailable": "Upgrade available"
+  },
+  "actions": {
+    "upgrade": "Upgrade Plan",
+    "manageBilling": "Manage Billing",
+    "cancelSubscription": "Cancel Subscription",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan"
+  },
+  "billing": {
+    "monthly": "/month",
+    "free": "Free",
+    "price": "${price}",
+    "popular": "Most Popular"
+  }
 }
