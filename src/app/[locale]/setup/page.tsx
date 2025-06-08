@@ -21,6 +21,10 @@ export default function Setup() {
   const t = useTranslations('setup');
   const tCommon = useTranslations('common');
   const tErrors = useTranslations('errors');
+
+  // Debug: Log the current locale and translations
+  console.log('🌐 Setup Page - Current locale:', locale);
+  console.log('🌐 Setup Page - Title translation:', t('title'));
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
