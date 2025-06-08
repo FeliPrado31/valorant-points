@@ -13,8 +13,8 @@
   },
   "fields": {
     "username": "Username",
-    "valorantName": "Valorant Name",
-    "valorantTag": "Valorant Tag"
+    "valorantName": "Riot ID",
+    "valorantTag": "Tag"
   },
   "actions": {
     "completeSetup": "Complete Setup & Start Missions",
@@ -30,8 +30,8 @@
     "setupFailed": "Setup failed. Please try again."
   },
   "playerInfo": {
-    "accountLevel": "Account Level: {level}",
-    "region": "Region: {region}",
-    "lastUpdate": "Last Update: {date}"
+    "accountLevel": "Level {level}",
+    "region": "{region}",
+    "lastUpdate": "Last updated: {date}"
   }
 }

@@ -13,8 +13,8 @@
   },
   "fields": {
     "username": "Nombre de Usuario",
-    "valorantName": "Nombre de Valorant",
-    "valorantTag": "Etiqueta de Valorant"
+    "valorantName": "Riot ID",
+    "valorantTag": "Etiqueta"
   },
   "actions": {
     "completeSetup": "Completar Configuración e Iniciar Misiones",
@@ -30,8 +30,8 @@
     "setupFailed": "Error en la configuración. Por favor intenta de nuevo."
   },
   "playerInfo": {
-    "accountLevel": "Nivel de Cuenta: {level}",
-    "region": "Región: {region}",
-    "lastUpdate": "Última Actualización: {date}"
+    "accountLevel": "Nivel {level}",
+    "region": "{region}",
+    "lastUpdate": "Última actualización: {date}"
   }
 }

@@ -1,30 +1,26 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle, Save, Globe } from 'lucide-react';
-import { 
-  useSetupTranslations, 
-  useCommonTranslations,
-  useErrorsTranslations 
-} from '@/hooks/useI18n';
+
+import { Target, Globe, Save, AlertCircle } from 'lucide-react';
 
 export default function Setup() {
   const { user } = useUser();
   const router = useRouter();
-  const locale = useLocale();
-  const t = useSetupTranslations();
-  const common = useCommonTranslations();
-  const errors = useErrorsTranslations();
-  
+  const params = useParams();
+  const locale = params.locale as string;
+
+  // Translation hooks
+  const t = useTranslations('setup');
+  const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
@@ -34,17 +30,10 @@ export default function Setup() {
     valorantTag: '',
   });
   const [playerVerified, setPlayerVerified] = useState(false);
-  const [playerData, setPlayerData] = useState<{ 
-    name: string; 
-    tag: string; 
-    accountLevel: number; 
-    region: string; 
-    lastUpdate: string; 
-    card: { wide: string; large: string } 
-  } | null>(null);
+  const [playerData, setPlayerData] = useState<{ name: string; tag: string; accountLevel: number; region: string; lastUpdate: string; card: { wide: string; large: string } } | null>(null);
   const [error, setError] = useState('');
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  // Check if user already has a Riot ID and redirect if they do
   useEffect(() => {
     const checkUserAccess = async () => {
       if (!user) return;
@@ -53,6 +42,7 @@ export default function Setup() {
         const response = await fetch('/api/users');
         if (response.ok) {
           const userData = await response.json();
+          // If user already has a Riot ID, redirect to dashboard
           if (userData.riotId && userData.riotId.puuid) {
             console.log('🔒 Setup: User already has Riot ID, redirecting to dashboard');
             router.push(`/${locale}/dashboard`);
@@ -75,35 +65,17 @@ export default function Setup() {
     }
   }, [user, router, locale]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.username.trim()) {
-      newErrors.username = errors('validation.required');
+  const verifyValorantPlayer = async () => {
+    if (!formData.valorantName || !formData.valorantTag) {
+      setError(tErrors('validation.invalidRiotId'));
+      return;
     }
-
-    if (!formData.valorantName.trim()) {
-      newErrors.valorantName = errors('validation.required');
-    }
-
-    if (!formData.valorantTag.trim()) {
-      newErrors.valorantTag = errors('validation.required');
-    } else if (!/^\d{3,5}$/.test(formData.valorantTag)) {
-      newErrors.valorantTag = errors('validation.invalidRiotId');
-    }
-
-    setValidationErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const verifyPlayer = async () => {
-    if (!validateForm()) return;
 
     setVerifying(true);
     setError('');
 
     try {
-      const response = await fetch('/api/valorant/verify-player', {
+      const response = await fetch('/api/riot-id/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,24 +87,34 @@ export default function Setup() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setPlayerData(data.player);
+        const result = await response.json();
+        setPlayerData(result.playerData);
         setPlayerVerified(true);
+        setError('');
       } else {
         const errorData = await response.json();
-        setError(errorData.message || t('messages.verificationFailed'));
+        setError(`${t('messages.verificationFailed')}: ${errorData.error}`);
+        setPlayerVerified(false);
+        setPlayerData(null);
       }
     } catch (error) {
       console.error('Error verifying player:', error);
-      setError(t('messages.verificationFailed'));
+      setError(tErrors('profile.verificationFailed'));
+      setPlayerVerified(false);
+      setPlayerData(null);
     } finally {
       setVerifying(false);
     }
   };
 
   const completeSetup = async () => {
-    if (!playerVerified) {
-      setError(t('messages.verificationFailed'));
+    if (!playerVerified || !playerData) {
+      setError(tErrors('profile.verificationFailed'));
+      return;
+    }
+
+    if (!formData.username.trim()) {
+      setError(tErrors('validation.required'));
       return;
     }
 
@@ -140,24 +122,23 @@ export default function Setup() {
     setError('');
 
     try {
-      const response = await fetch('/api/users/complete-setup', {
+      const response = await fetch('/api/riot-id/link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          playerData,
           username: formData.username,
-          valorantName: formData.valorantName,
-          valorantTag: formData.valorantTag,
         }),
       });
 
       if (response.ok) {
-        console.log('✅ Setup completed successfully');
+        // Setup completed successfully, redirect to dashboard
         router.push(`/${locale}/dashboard`);
       } else {
         const errorData = await response.json();
-        setError(errorData.message || t('messages.setupFailed'));
+        setError(`${tErrors('profile.saveFailed')}: ${errorData.error}`);
       }
     } catch (error) {
       console.error('Error completing setup:', error);
@@ -167,16 +148,25 @@ export default function Setup() {
     }
   };
 
+  // Show loading while checking access
   if (checkingAccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">{common('buttons.loading')}</div>
+        <div className="text-white text-xl">{tCommon('status.loading')}</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Header */}
+      <div className="flex items-center justify-center p-6">
+        <div className="flex items-center space-x-2">
+          <Target className="h-8 w-8 text-red-500" />
+          <span className="text-2xl font-bold text-white">Valorant Missions</span>
+        </div>
+      </div>
+
       <div className="container mx-auto px-6 py-8 max-w-2xl">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader className="text-center">
@@ -194,93 +184,133 @@ export default function Setup() {
               </div>
             )}
 
-            {/* Instructions */}
-            <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
-              <h3 className="text-blue-300 font-semibold mb-2">{t('instructions.enterRiotId')}</h3>
-              <p className="text-blue-200 text-sm mb-2">{t('instructions.format')}</p>
-              <p className="text-blue-200 text-xs">{t('instructions.note')}</p>
-            </div>
-
-            {/* Form Fields */}
+            {/* Basic Info */}
             <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-white">{tCommon('labels.name')}</h3>
+
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">
-                  {t('fields.username')}
-                </Label>
+                <Label htmlFor="username" className="text-white">{t('fields.username')}</Label>
                 <Input
                   id="username"
                   value={formData.username}
                   onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
+                  className="bg-slate-700 border-slate-600 text-white"
+                  placeholder={t('fields.username')}
+                  required
                 />
-                {validationErrors.username && (
-                  <p className="text-red-400 text-sm">{validationErrors.username}</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="valorantName" className="text-white">
-                    {t('fields.valorantName')}
-                  </Label>
-                  <Input
-                    id="valorantName"
-                    value={formData.valorantName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, valorantName: e.target.value }))}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
-                  />
-                  {validationErrors.valorantName && (
-                    <p className="text-red-400 text-sm">{validationErrors.valorantName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="valorantTag" className="text-white">
-                    {t('fields.valorantTag')}
-                  </Label>
-                  <Input
-                    id="valorantTag"
-                    value={formData.valorantTag}
-                    onChange={(e) => setFormData(prev => ({ ...prev, valorantTag: e.target.value }))}
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400 focus:border-red-500"
-                  />
-                  {validationErrors.valorantTag && (
-                    <p className="text-red-400 text-sm">{validationErrors.valorantTag}</p>
-                  )}
-                </div>
               </div>
             </div>
 
-            {/* Verify Player Button */}
-            <Button
-              onClick={verifyPlayer}
-              disabled={verifying || !formData.valorantName || !formData.valorantTag}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {verifying ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {t('actions.verifying')}
-                </>
-              ) : (
-                <>
-                  <Globe className="h-4 w-4 mr-2" />
-                  {t('actions.verifyPlayer')}
-                </>
-              )}
-            </Button>
+            {/* Valorant Account */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-white">{t('fields.valorantName')}</h3>
+              <p className="text-gray-400 text-sm">
+                {t('instructions.enterRiotId')}
+              </p>
 
-            {/* Player Verification Success */}
-            {playerVerified && playerData && (
-              <div className="bg-green-900/30 border border-green-700 rounded-lg p-4">
-                <div className="flex items-center space-x-2 mb-3">
-                  <CheckCircle className="h-5 w-5 text-green-400" />
-                  <span className="text-green-300 font-semibold">{t('messages.verificationSuccess')}</span>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="valorantName" className="text-white">{t('fields.valorantName')}</Label>
+                  <Input
+                    id="valorantName"
+                    value={formData.valorantName}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, valorantName: e.target.value }));
+                      setPlayerVerified(false);
+                      setPlayerData(null);
+                      setError('');
+                    }}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    placeholder="YourName"
+                    required
+                  />
                 </div>
-                <div className="text-green-200 text-sm space-y-1">
-                  <p>{t('playerInfo.accountLevel', { level: playerData.accountLevel })}</p>
-                  <p>{t('playerInfo.region', { region: playerData.region })}</p>
-                  <p>{t('playerInfo.lastUpdate', { date: new Date(playerData.lastUpdate).toLocaleDateString(locale) })}</p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="valorantTag" className="text-white">{t('fields.valorantTag')}</Label>
+                  <Input
+                    id="valorantTag"
+                    value={formData.valorantTag}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, valorantTag: e.target.value }));
+                      setPlayerVerified(false);
+                      setPlayerData(null);
+                      setError('');
+                    }}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    placeholder="1234"
+                    required
+                  />
+                </div>
+              </div>
+
+
+
+              <div className="flex items-center space-x-4">
+                <Button
+                  onClick={verifyValorantPlayer}
+                  disabled={verifying || !formData.valorantName || !formData.valorantTag}
+                  variant="outline"
+                  className="text-white border-slate-600 hover:bg-slate-800"
+                >
+                  <Globe className={`h-4 w-4 mr-2 ${verifying ? 'animate-spin' : ''}`} />
+                  {verifying ? t('actions.verifying') : t('actions.verifyPlayer')}
+                </Button>
+
+                {playerVerified && (
+                  <div className="text-green-400 text-sm flex items-center space-x-1">
+                    <span>✓</span>
+                    <span>{t('messages.verificationSuccess')}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Player Card Display */}
+            {playerVerified && playerData && (
+              <div className="space-y-4">
+                <div className="border-t border-slate-600 pt-6">
+                  <h3 className="text-white text-lg font-semibold mb-4">{t('steps.verification')}</h3>
+
+                  <div className="bg-slate-700/50 rounded-lg p-4 space-y-4">
+                    {/* Player Info */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-semibold text-lg">
+                          {playerData.name}#{playerData.tag}
+                        </div>
+                        <div className="text-gray-300 text-sm">
+                          {t('playerInfo.accountLevel', { level: playerData.accountLevel })} • {t('playerInfo.region', { region: playerData.region.toUpperCase() })}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {t('playerInfo.lastUpdate', { date: playerData.lastUpdate })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Player Card */}
+                    <div className="space-y-2">
+                      <div className="text-white text-sm font-medium">Player Card:</div>
+                      <div className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={playerData.card.wide}
+                          alt="Player Card"
+                          className="w-full max-w-md rounded-lg border border-slate-600"
+                          onError={(e) => {
+                            // Fallback to large card if wide card fails
+                            e.currentTarget.src = playerData.card.large;
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
+                      <div className="text-blue-300 text-sm">
+                        ✓ {t('instructions.note')}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -295,6 +325,10 @@ export default function Setup() {
                 <Save className={`h-5 w-5 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 {loading ? t('actions.setupInProgress') : t('actions.completeSetup')}
               </Button>
+            </div>
+
+            <div className="text-center text-gray-400 text-sm">
+              {t('instructions.note')}
             </div>
           </CardContent>
         </Card>
