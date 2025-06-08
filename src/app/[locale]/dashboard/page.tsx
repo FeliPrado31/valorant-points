@@ -251,14 +251,14 @@ function DashboardContent() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-                      {nav('welcome').replace('{name}', userProfile.username)}
+                      {nav('welcome', { name: userProfile.username })}
                     </h2>
                     <p className="text-gray-300 text-sm sm:text-base">
-                      Connected Riot ID: <span className="text-red-400 font-semibold">{userProfile.valorantTag}</span>
+                      {t('welcome.connectedRiotId', { riotId: userProfile.valorantTag })}
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
-                    <div className="text-sm text-gray-400">Ready to complete missions!</div>
+                    <div className="text-sm text-gray-400">{t('welcome.readyMessage')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -279,7 +279,7 @@ function DashboardContent() {
         >
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Active Missions</CardTitle>
+              <CardTitle className="text-sm font-medium text-white">{t('stats.activeMissions')}</CardTitle>
               <Target className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
@@ -289,7 +289,7 @@ function DashboardContent() {
 
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Completed</CardTitle>
+              <CardTitle className="text-sm font-medium text-white">{t('stats.completedMissions')}</CardTitle>
               <Trophy className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
@@ -299,7 +299,7 @@ function DashboardContent() {
 
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Points</CardTitle>
+              <CardTitle className="text-sm font-medium text-white">{t('stats.totalPoints')}</CardTitle>
               <Users className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
