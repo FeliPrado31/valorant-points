@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -53,8 +54,7 @@ interface RecentMatch {
 }
 
 function DashboardContent() {
-  // TODO: Implement Ko-fi authentication
-  const user = null;
+  const { user } = useUser();
   const [userMissions, setUserMissions] = useState<UserMission[]>([]);
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [userProfile, setUserProfile] = useState<{ username: string; valorantTag: string; riotId?: { puuid: string; region: string }; subscription?: { tier: string } } | null>(null);
@@ -545,6 +545,8 @@ function DashboardContent() {
         isOpen={showPricingModal}
         onClose={() => setShowPricingModal(false)}
         currentTier={(userProfile?.subscription?.tier as 'free' | 'standard' | 'premium') || 'free'}
+        userEmail={user?.emailAddresses?.[0]?.emailAddress}
+        userId={user?.id}
       />
     </div>
   );

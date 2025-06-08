@@ -31,6 +31,7 @@ export const adminAuth = getAuth();
 // Types for our collections
 export interface User {
   id: string;
+  clerkId: string;
   email: string;
   username: string;
   valorantTag?: string;

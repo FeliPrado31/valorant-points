@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { adminDb, User, getSubscriptionTier, getMaxActiveMissions, shouldRefreshMissionSlots, SUBSCRIPTION_TIERS, getTierFromKofiTierId, getKofiTierIdFromTier } from '@/lib/firebase-admin';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // TODO: Implement Ko-fi authentication
-    // For now, get userId from headers or query params
-    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
+    const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user document
@@ -132,11 +131,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Implement Ko-fi authentication
-    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
+    const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();

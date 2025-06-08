@@ -32,34 +32,39 @@ export async function GET() {
 
     // If user has Ko-fi subscription, fetch latest status from Ko-fi API
     if (subscription?.kofiSubscriptionId) {
-      const kofiClient = getKofiApiClient();
-      const kofiResponse = await kofiClient.getSubscription(subscription.kofiSubscriptionId);
+      try {
+        const kofiClient = getKofiApiClient();
+        const kofiResponse = await kofiClient.getSubscription(subscription.kofiSubscriptionId);
 
-      if (kofiResponse.success && kofiResponse.data) {
-        const kofiSubscription = kofiResponse.data;
-        
-        // Update local data with latest Ko-fi status
-        const internalTier = mapKofiTierToInternal(kofiSubscription.tier);
-        const internalStatus = mapKofiStatusToInternal(kofiSubscription.status);
-        
-        const updatedSubscription = {
-          ...subscription,
-          tier: internalTier,
-          status: internalStatus,
-          kofiTierId: kofiSubscription.tier,
-          currentPeriodEnd: kofiSubscription.next_payment_date ? new Date(kofiSubscription.next_payment_date) : null
-        };
+        if (kofiResponse.success && kofiResponse.data) {
+          const kofiSubscription = kofiResponse.data;
 
-        // Update Firebase with latest data
-        await adminDb.collection('users').doc(userId).update({
-          'subscription': updatedSubscription,
-          updatedAt: new Date()
-        });
+          // Update local data with latest Ko-fi status
+          const internalTier = mapKofiTierToInternal(kofiSubscription.tier);
+          const internalStatus = mapKofiStatusToInternal(kofiSubscription.status);
 
-        return NextResponse.json({
-          subscription: updatedSubscription,
-          kofiData: kofiSubscription
-        });
+          const updatedSubscription = {
+            ...subscription,
+            tier: internalTier,
+            status: internalStatus,
+            kofiTierId: kofiSubscription.tier,
+            currentPeriodEnd: kofiSubscription.next_payment_date ? new Date(kofiSubscription.next_payment_date) : null
+          };
+
+          // Update Firebase with latest data
+          await adminDb.collection('users').doc(userId).update({
+            'subscription': updatedSubscription,
+            updatedAt: new Date()
+          });
+
+          return NextResponse.json({
+            subscription: updatedSubscription,
+            kofiData: kofiSubscription,
+            syncedFromKofi: true
+          });
+        }
+      } catch (kofiError) {
+        console.warn('⚠️ Failed to fetch Ko-fi subscription, using local data:', kofiError);
       }
     }
 
@@ -69,7 +74,8 @@ export async function GET() {
         tier: 'free',
         status: 'active',
         provider: 'kofi'
-      }
+      },
+      syncedFromKofi: false
     });
 
   } catch (error) {
@@ -171,7 +177,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       subscription: kofiSubscription,
-      checkoutUrl: kofiClient.getCheckoutUrl(tier as 'standard' | 'premium', userId, userEmail)
+      checkoutUrl: kofiClient.getCheckoutUrl(tier as 'standard' | 'premium', userId, userEmail),
+      message: `Ko-fi subscription created for ${tier} tier`
     });
 
   } catch (error) {

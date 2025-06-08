@@ -3,6 +3,8 @@
  * Handles Ko-fi API interactions for the Valorant Points application
  */
 
+import { validateKofiConfiguration } from './env-validation';
+
 // Ko-fi API Types
 export interface KofiSubscription {
   id: string;
@@ -64,15 +66,21 @@ export class KofiApiClient {
   private webhookSecret: string;
 
   constructor() {
-    this.apiKey = process.env.KOFI_API_KEY!;
+    this.apiKey = process.env.KOFI_API_KEY || '';
     this.baseUrl = process.env.KOFI_API_BASE_URL || 'https://ko-fi.com/api/v2';
-    this.webhookSecret = process.env.KOFI_WEBHOOK_SECRET!;
+    this.webhookSecret = process.env.KOFI_WEBHOOK_SECRET || '';
+
+    // Validate Ko-fi configuration on initialization
+    const isConfigured = validateKofiConfiguration();
+    if (!isConfigured) {
+      console.warn('⚠️ Ko-fi configuration incomplete. Some features may not work.');
+    }
 
     if (!this.apiKey) {
-      throw new Error('KOFI_API_KEY environment variable is required');
+      console.warn('⚠️ KOFI_API_KEY environment variable is not set. Ko-fi API calls will fail.');
     }
     if (!this.webhookSecret) {
-      throw new Error('KOFI_WEBHOOK_SECRET environment variable is required');
+      console.warn('⚠️ KOFI_WEBHOOK_SECRET environment variable is not set. Webhook verification will fail.');
     }
   }
 
@@ -80,7 +88,7 @@ export class KofiApiClient {
    * Validates the Ko-fi API key format
    */
   private validateApiKey(): boolean {
-    return this.apiKey.startsWith('KF_API_') && this.apiKey.length > 20;
+    return Boolean(this.apiKey && this.apiKey.startsWith('KF_API_') && this.apiKey.length > 20);
   }
 
   /**
@@ -219,24 +227,48 @@ export class KofiApiClient {
    */
   verifyWebhookSignature(payload: string, signature: string): boolean {
     if (!signature || !payload) {
+      console.error('❌ Missing signature or payload for webhook verification');
+      return false;
+    }
+
+    if (!this.webhookSecret) {
+      console.error('❌ KOFI_WEBHOOK_SECRET not configured');
       return false;
     }
 
     try {
       // Ko-fi uses HMAC-SHA256 for webhook signatures
       const crypto = require('crypto');
+
+      // Remove any prefix from signature (e.g., "sha256=")
+      const cleanSignature = signature.replace(/^sha256=/, '');
+
       const expectedSignature = crypto
         .createHmac('sha256', this.webhookSecret)
-        .update(payload)
+        .update(payload, 'utf8')
         .digest('hex');
 
+      console.log('🔐 Webhook signature verification:', {
+        signatureLength: cleanSignature.length,
+        expectedLength: expectedSignature.length,
+        payloadLength: payload.length
+      });
+
       // Compare signatures using timing-safe comparison
-      return crypto.timingSafeEqual(
-        Buffer.from(signature, 'hex'),
+      const isValid = crypto.timingSafeEqual(
+        Buffer.from(cleanSignature, 'hex'),
         Buffer.from(expectedSignature, 'hex')
       );
+
+      if (!isValid) {
+        console.error('❌ Webhook signature verification failed');
+      } else {
+        console.log('✅ Webhook signature verified successfully');
+      }
+
+      return isValid;
     } catch (error) {
-      console.error('Webhook signature verification failed:', error);
+      console.error('❌ Webhook signature verification error:', error);
       return false;
     }
   }

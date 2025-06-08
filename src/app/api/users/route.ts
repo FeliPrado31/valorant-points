@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { adminDb, User, getMaxActiveMissions } from '@/lib/firebase-admin';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // TODO: Implement Ko-fi authentication
-    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
+    const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user from Firestore
@@ -27,11 +27,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Implement Ko-fi authentication
-    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
+    const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -47,6 +46,7 @@ export async function POST(request: NextRequest) {
 
     const userData: User = {
       id: userId,
+      clerkId: userId,
       email,
       username,
       valorantTag,
@@ -85,11 +85,10 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // TODO: Implement Ko-fi authentication
-    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
+    const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();

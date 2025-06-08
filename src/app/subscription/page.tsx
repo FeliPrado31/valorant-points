@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,8 +29,7 @@ interface SubscriptionInfo {
 }
 
 export default function SubscriptionPage() {
-  // TODO: Implement Ko-fi authentication
-  const user = null;
+  const { user } = useUser();
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPricingTable, setShowPricingTable] = useState(false);
