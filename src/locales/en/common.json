@@ -30,12 +30,22 @@
     "filter": "Filter",
     "sort": "Sort",
     "date": "Date",
+    "time": "Time",
     "status": "Status",
     "progress": "Progress",
     "name": "Name",
+    "title": "Title",
     "description": "Description",
     "type": "Type",
-    "category": "Category"
+    "category": "Category",
+    "location": "Location",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "discount": "Discount",
+    "features": "Features"
   },
   "status": {
     "active": "Active",
@@ -48,7 +58,11 @@
     "warning": "Warning",
     "info": "Info",
     "loading": "Loading...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "cancelled": "Cancelled",
+    "expired": "Expired",
+    "draft": "Draft",
+    "published": "Published"
   },
   "time": {
     "hours": "hours",
@@ -71,5 +85,17 @@
     "last": "last",
     "total": "total",
     "count": "count"
+  },
+  "messages": {
+    "success": "Success!",
+    "error": "Error occurred",
+    "warning": "Warning",
+    "info": "Information",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "serverError": "Server error"
   }
 }

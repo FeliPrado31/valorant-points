@@ -16,6 +16,8 @@
       "description": "Experiencia mejorada de misiones",
       "features": [
         "Hasta 7 misiones activas",
+        "Seguimiento avanzado de misiones",
+        "Actualización diaria de misiones",
         "Estadísticas avanzadas",
         "Soporte prioritario",
         "Filtros de misiones"
@@ -26,29 +28,37 @@
       "description": "Experiencia definitiva de misiones",
       "features": [
         "Misiones activas ilimitadas",
+        "Seguimiento avanzado de misiones",
+        "Actualización diaria de misiones",
         "Análisis avanzados",
         "Soporte premium",
-        "Acceso anticipado a funciones"
+        "Acceso anticipado a funciones",
+        "Misiones exclusivas"
       ]
-    }
+    },
+    "comparison": "Elige tu Plan"
   },
-  "status": {
-    "currentPlan": "Plan Actual",
-    "dailySlotsUsed": "Espacios Diarios Usados",
-    "dailyLimitReached": "Límite diario alcanzado. Se reinicia en {hours} horas",
-    "upgradeAvailable": "Mejora disponible"
+  "billing": {
+    "monthly": "/mes",
+    "free": "Gratis",
+    "price": "${price}",
+    "popular": "Más Popular",
+    "completeSubscription": "Completa tu Suscripción",
+    "choosePaymentMethod": "Elige tu método de pago y completa el proceso de suscripción",
+    "choosePlan": "Desbloquea más misiones y funciones con nuestros planes de suscripción"
   },
   "actions": {
     "upgrade": "Mejorar Plan",
     "manageBilling": "Gestionar Facturación",
     "cancelSubscription": "Cancelar Suscripción",
     "selectPlan": "Seleccionar Plan",
-    "currentPlan": "Plan Actual"
+    "currentPlan": "Plan Actual",
+    "downgrade": "Degradar"
   },
-  "billing": {
-    "monthly": "/mes",
-    "free": "Gratis",
-    "price": "${price}",
-    "popular": "Más Popular"
+  "status": {
+    "currentPlan": "Plan Actual",
+    "dailySlotsUsed": "Espacios Diarios Usados",
+    "dailyLimitReached": "Límite diario alcanzado. Se reinicia en {hours} horas",
+    "upgradeAvailable": "¿Quieres más misiones? ¡Mejora tu plan!"
   }
 }

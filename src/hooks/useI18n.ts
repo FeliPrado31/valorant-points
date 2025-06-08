@@ -2,10 +2,6 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Locale, Namespace } from '@/lib/i18n';
 import { useEffect, useState } from 'react';
 
-// Base hook for any namespace
-export function useNamespaceTranslations(namespace: Namespace) {
-  return useTranslations(namespace);
-}
 
 // Locale hook
 export function useCurrentLocale(): Locale {
@@ -74,15 +70,15 @@ function useDynamicTranslations(namespace: string) {
 
 // Placeholder hooks for parallel development
 export function useCommonTranslations() {
-  return useNamespaceTranslations('common');
+  return useTranslations();
 }
 
 export function useNavigationTranslations() {
-  return useNamespaceTranslations('navigation');
+  return useTranslations();
 }
 
 export function useDashboardTranslations() {
-  return useNamespaceTranslations('dashboard');
+  return useTranslations();
 }
 
 export function useProfileTranslations() {
@@ -94,11 +90,11 @@ export function useSetupTranslations() {
 }
 
 export function useSubscriptionTranslations() {
-  return useNamespaceTranslations('subscription');
+  return useTranslations();
 }
 
 export function useMissionsTranslations() {
-  return useNamespaceTranslations('missions');
+  return useTranslations();
 }
 
 export function useErrorsTranslations() {

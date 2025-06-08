@@ -30,12 +30,22 @@
     "filter": "Filtrar",
     "sort": "Ordenar",
     "date": "Fecha",
+    "time": "Hora",
     "status": "Estado",
     "progress": "Progreso",
     "name": "Nombre",
+    "title": "Título",
     "description": "Descripción",
     "type": "Tipo",
-    "category": "Categoría"
+    "category": "Categoría",
+    "location": "Ubicación",
+    "price": "Precio",
+    "quantity": "Cantidad",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Impuesto",
+    "discount": "Descuento",
+    "features": "Características"
   },
   "status": {
     "active": "Activo",
@@ -48,7 +58,11 @@
     "warning": "Advertencia",
     "info": "Información",
     "loading": "Cargando...",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "cancelled": "Cancelado",
+    "expired": "Expirado",
+    "draft": "Borrador",
+    "published": "Publicado"
   },
   "time": {
     "hours": "horas",
@@ -71,5 +85,17 @@
     "last": "último",
     "total": "total",
     "count": "cantidad"
+  },
+  "messages": {
+    "success": "¡Éxito!",
+    "error": "Ocurrió un error",
+    "warning": "Advertencia",
+    "info": "Información",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles",
+    "notFound": "No encontrado",
+    "unauthorized": "Acceso no autorizado",
+    "forbidden": "Acceso prohibido",
+    "serverError": "Error del servidor"
   }
 }

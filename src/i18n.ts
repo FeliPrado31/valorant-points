@@ -1,17 +1,19 @@
 ﻿import { getRequestConfig } from 'next-intl/server';
 
 export default getRequestConfig(async ({ locale }) => {
+  const actualLocale = locale || 'en';
+
   return {
-    locale: locale!,
+    locale: actualLocale,
     messages: {
-      common: (await import(`./locales/${locale}/common.json`)).default,
-      navigation: (await import(`./locales/${locale}/navigation.json`)).default,
-      dashboard: (await import(`./locales/${locale}/dashboard.json`)).default,
-      profile: (await import(`./locales/${locale}/profile.json`)).default,
-      setup: (await import(`./locales/${locale}/setup.json`)).default,
-      subscription: (await import(`./locales/${locale}/subscription.json`)).default,
-      missions: (await import(`./locales/${locale}/missions.json`)).default,
-      errors: (await import(`./locales/${locale}/errors.json`)).default
+      common: (await import(`./locales/${actualLocale}/common.json`)).default,
+      navigation: (await import(`./locales/${actualLocale}/navigation.json`)).default,
+      dashboard: (await import(`./locales/${actualLocale}/dashboard.json`)).default,
+      profile: (await import(`./locales/${actualLocale}/profile.json`)).default,
+      setup: (await import(`./locales/${actualLocale}/setup.json`)).default,
+      subscription: (await import(`./locales/${actualLocale}/subscription.json`)).default,
+      missions: (await import(`./locales/${actualLocale}/missions.json`)).default,
+      errors: (await import(`./locales/${actualLocale}/errors.json`)).default
     }
   };
 });
