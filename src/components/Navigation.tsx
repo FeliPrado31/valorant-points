@@ -3,9 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Target, Menu, X, User, CreditCard, LayoutDashboard, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigationTranslations } from '@/hooks/useI18n';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface NavigationProps {
   user?: {
@@ -16,30 +19,33 @@ interface NavigationProps {
   refreshing?: boolean;
 }
 
-const navigationItems = [
-  {
-    href: '/dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
-    description: 'View your missions and progress'
-  },
-  {
-    href: '/profile',
-    label: 'Profile',
-    icon: User,
-    description: 'Manage your account settings'
-  },
-  {
-    href: '/subscription',
-    label: 'Subscription',
-    icon: CreditCard,
-    description: 'Manage your subscription plan'
-  }
-];
-
 export default function Navigation({ user, onRefresh, refreshing }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const locale = useLocale();
+  const t = useNavigationTranslations();
+
+  // Create navigation items with translations
+  const navigationItems = [
+    {
+      href: '/dashboard',
+      label: t('items.dashboard.label'),
+      icon: LayoutDashboard,
+      description: t('items.dashboard.description')
+    },
+    {
+      href: '/profile',
+      label: t('items.profile.label'),
+      icon: User,
+      description: t('items.profile.description')
+    },
+    {
+      href: '/subscription',
+      label: t('items.subscription.label'),
+      icon: CreditCard,
+      description: t('items.subscription.description')
+    }
+  ];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -49,20 +55,25 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
     setIsMobileMenuOpen(false);
   };
 
+  // Helper function to create locale-aware links
+  const createLocalizedHref = (href: string) => {
+    return `/${locale}${href}`;
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-900/95 backdrop-blur-md supports-[backdrop-filter]:bg-slate-900/80">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
-            href="/"
+            href={createLocalizedHref('/')}
             className="flex items-center space-x-2 group"
             onClick={closeMobileMenu}
           >
             <Target className="h-8 w-8 text-red-500 transition-transform group-hover:scale-110" />
             <span className="text-xl font-bold text-white sm:text-2xl">
-              <span className="hidden sm:inline">Valorant Missions</span>
-              <span className="sm:hidden">VM</span>
+              <span className="hidden sm:inline">{t('brand.name')}</span>
+              <span className="sm:hidden">{t('brand.shortName')}</span>
             </span>
           </Link>
 
@@ -70,10 +81,10 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
           <div className="hidden md:flex md:items-center md:space-x-2">
             {navigationItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive = pathname === createLocalizedHref(item.href);
 
               return (
-                <Link key={item.href} href={item.href}>
+                <Link key={item.href} href={createLocalizedHref(item.href)}>
                   <Button
                     variant="navigation"
                     size="default"
@@ -96,11 +107,17 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
                 variant="navigation"
                 size="default"
                 className="ml-2"
+                aria-label={t('actions.refreshProgress')}
               >
                 <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-                <span className="hidden lg:inline">Refresh</span>
+                <span className="hidden lg:inline">{t('actions.refresh')}</span>
               </Button>
             )}
+
+            {/* Language Switcher - Desktop */}
+            <div className="ml-4">
+              <LanguageSwitcher variant="dropdown" />
+            </div>
           </div>
 
           {/* User Info & Mobile Menu Button */}
@@ -108,9 +125,14 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
             {/* User Welcome (Desktop) */}
             {user && (
               <div className="hidden md:block text-sm text-white/90">
-                Welcome, {user.firstName || user.username}!
+                {t('welcome', { name: user.firstName || user.username })}
               </div>
             )}
+
+            {/* Language Switcher - Mobile (Button Style) */}
+            <div className="md:hidden">
+              <LanguageSwitcher variant="button" />
+            </div>
 
             {/* Mobile Menu Button */}
             <Button
@@ -118,7 +140,7 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
               size="icon"
               className="md:hidden"
               onClick={toggleMobileMenu}
-              aria-label="Toggle navigation menu"
+              aria-label={isMobileMenuOpen ? t('mobileMenu.close') : t('mobileMenu.open')}
               aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? (
@@ -137,19 +159,19 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
               {/* User Welcome (Mobile) */}
               {user && (
                 <div className="px-3 py-2 text-sm text-white/90 border-b border-white/10 mb-2">
-                  Welcome, {user.firstName || user.username}!
+                  {t('welcome', { name: user.firstName || user.username })}
                 </div>
               )}
 
               {/* Navigation Items */}
               {navigationItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = pathname === createLocalizedHref(item.href);
 
                 return (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={createLocalizedHref(item.href)}
                     onClick={closeMobileMenu}
                     className="block"
                   >
@@ -185,8 +207,8 @@ export default function Navigation({ user, onRefresh, refreshing }: NavigationPr
                 >
                   <RefreshCw className={cn("h-5 w-5 mr-3", refreshing && "animate-spin")} />
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">Refresh Progress</span>
-                    <span className="text-xs text-white/70">Update mission progress</span>
+                    <span className="font-medium">{t('actions.refreshProgress')}</span>
+                    <span className="text-xs text-white/70">{t('actions.updateMissionProgress')}</span>
                   </div>
                 </Button>
               )}
