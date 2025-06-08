@@ -102,7 +102,7 @@ export function KofiEmailConfirmationModal({
             <ol className="space-y-2 text-sm text-gray-300">
               <li className="flex items-start gap-2">
                 <span className="text-green-400 font-bold">1.</span>
-                You'll be redirected to Ko-fi in a new tab
+                You&apos;ll be redirected to Ko-fi in a new tab
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-400 font-bold">2.</span>

@@ -10,7 +10,7 @@ import { Grid } from '@/components/ui/grid';
 import Navigation from '@/components/Navigation';
 import { KofiEmailConfirmationModal } from '@/components/KofiEmailConfirmationModal';
 import { Target, Crown, Zap } from 'lucide-react';
-import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
+
 
 interface SubscriptionInfo {
   tier: 'free' | 'standard' | 'premium';
@@ -311,7 +311,7 @@ export default function SubscriptionPage() {
                     Premium Member
                   </h2>
                   <p className="text-gray-300 text-sm sm:text-base">
-                    You're enjoying all premium features with unlimited missions!
+                    You&apos;re enjoying all premium features with unlimited missions!
                   </p>
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function SubscriptionPage() {
                       <Crown className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
                       <h3 className="text-xl font-bold text-white mb-2">You have the highest tier!</h3>
                       <p className="text-gray-300">
-                        You're already enjoying all premium features with unlimited missions.
+                        You&apos;re already enjoying all premium features with unlimited missions.
                       </p>
                     </div>
                   ) : (

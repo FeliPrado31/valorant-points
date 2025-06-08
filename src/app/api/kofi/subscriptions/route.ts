@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { getKofiApiClient, mapKofiStatusToInternal, mapKofiTierToInternal } from '@/lib/kofi-api';
-import { getMaxActiveMissions, type SubscriptionTierKey } from '@/lib/subscription-types';
+import { getMaxActiveMissions } from '@/lib/subscription-types';
 
 /**
  * Ko-fi Subscription Management API

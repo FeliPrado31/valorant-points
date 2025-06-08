@@ -44,7 +44,8 @@ export async function GET() {
         ...userData,
         subscription: {
           tier: 'free',
-          status: 'active'
+          status: 'active',
+          provider: 'kofi'
         },
         missionLimits: {
           maxActiveMissions: maxMissions,

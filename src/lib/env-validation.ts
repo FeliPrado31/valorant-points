@@ -12,6 +12,7 @@ interface EnvironmentConfig {
   KOFI_API_KEY?: string;
   KOFI_WEBHOOK_SECRET?: string;
   KOFI_API_BASE_URL?: string;
+  KOFI_PAGE_URL?: string;
   NEXT_PUBLIC_APP_URL?: string;
 
   // Firebase (Required)

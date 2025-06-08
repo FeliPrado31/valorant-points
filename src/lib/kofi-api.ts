@@ -35,7 +35,7 @@ export interface KofiWebhookEvent {
   signature: string;
 }
 
-export interface KofiApiResponse<T = any> {
+export interface KofiApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -246,7 +246,7 @@ export class KofiApiClient {
   /**
    * Verify Ko-fi webhook signature
    */
-  verifyWebhookSignature(payload: string, signature: string): boolean {
+  async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
     if (!signature || !payload) {
       console.error('❌ Missing signature or payload for webhook verification');
       return false;
@@ -259,7 +259,7 @@ export class KofiApiClient {
 
     try {
       // Ko-fi uses HMAC-SHA256 for webhook signatures
-      const crypto = require('crypto');
+      const crypto = await import('crypto');
 
       // Remove any prefix from signature (e.g., "sha256=")
       const cleanSignature = signature.replace(/^sha256=/, '');

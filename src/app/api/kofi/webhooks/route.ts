@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Verify webhook signature
     const kofiClient = getKofiApiClient();
-    if (!kofiClient.verifyWebhookSignature(body, signature)) {
+    if (!(await kofiClient.verifyWebhookSignature(body, signature))) {
       console.error('❌ Invalid Ko-fi webhook signature');
       return NextResponse.json(
         { error: 'Invalid signature' },
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
  * Handle subscription created event
  */
 async function handleSubscriptionCreated(event: KofiWebhookEvent) {
-  const { user_id, subscription_id, tier, status, email } = event.data;
+  const { user_id, subscription_id, tier, status } = event.data;
   
   console.log('✅ Processing subscription created:', {
     userId: user_id,

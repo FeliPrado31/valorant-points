@@ -191,6 +191,6 @@ export interface EnhancedSubscription {
 }
 
 // Utility to get billing provider (always Ko-fi now)
-export const getBillingProvider = (user: Record<string, unknown>): BillingProvider => {
+export const getBillingProvider = (): BillingProvider => {
   return 'kofi';
 };
