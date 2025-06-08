@@ -20,11 +20,12 @@
   "actions": {
     "refresh": "Refresh",
     "refreshProgress": "Refresh Progress",
-    "updateMissionProgress": "Update mission progress"
+    "updateMissionProgress": "Update mission progress",
+    "toggleMenu": "Toggle navigation menu"
   },
+  "welcome": "Welcome, {name}!",
   "mobileMenu": {
-    "open": "Toggle navigation menu",
-    "close": "Close navigation menu"
-  },
-  "welcome": "Welcome, {name}!"
+    "open": "Open menu",
+    "close": "Close menu"
+  }
 }

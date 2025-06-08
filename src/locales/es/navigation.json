@@ -6,25 +6,26 @@
   "items": {
     "dashboard": {
       "label": "Panel",
-      "description": "Ver tus misiones y progreso"
+      "description": "Ve tus misiones y progreso"
     },
     "profile": {
       "label": "Perfil",
-      "description": "Administrar tu configuración de cuenta"
+      "description": "Gestiona la configuración de tu cuenta"
     },
     "subscription": {
       "label": "Suscripción",
-      "description": "Administrar tu plan de suscripción"
+      "description": "Gestiona tu plan de suscripción"
     }
   },
   "actions": {
     "refresh": "Actualizar",
     "refreshProgress": "Actualizar Progreso",
-    "updateMissionProgress": "Actualizar progreso de misión"
+    "updateMissionProgress": "Actualizar progreso de misiones",
+    "toggleMenu": "Alternar menú de navegación"
   },
+  "welcome": "¡Bienvenido, {name}!",
   "mobileMenu": {
-    "open": "Abrir menú de navegación",
-    "close": "Cerrar menú de navegación"
-  },
-  "welcome": "¡Bienvenido, {name}!"
+    "open": "Abrir menú",
+    "close": "Cerrar menú"
+  }
 }
