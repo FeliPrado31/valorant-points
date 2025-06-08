@@ -26,12 +26,17 @@
   "profile": {
     "saveFailed": "Failed to save profile changes.",
     "verificationFailed": "Player verification failed.",
-    "linkFailed": "Failed to link Riot account."
+    "linkFailed": "Failed to link Riot account.",
+    "loadFailed": "Failed to load profile"
   },
   "subscription": {
     "upgradeFailed": "Failed to upgrade subscription.",
     "cancelFailed": "Failed to cancel subscription.",
     "paymentFailed": "Payment processing failed."
+  },
+  "network": {
+    "connectionError": "Connection error. Please try again.",
+    "serverError": "Server error. Please try again later."
   },
   "general": {
     "unexpectedError": "An unexpected error occurred.",

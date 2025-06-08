@@ -21,21 +21,21 @@
   "actions": {
     "verify": "Verify Player",
     "saveProfile": "Save Profile",
-    "linkAccount": "Link Account",
+    "linkAccount": "Link Riot Account",
     "verifying": "Verifying...",
     "saving": "Saving..."
-  },
-  "messages": {
-    "verificationSuccess": "Player verified successfully!",
-    "profileSaved": "Profile saved successfully!",
-    "accountLinked": "Riot ID linked successfully!",
-    "verificationFailed": "Player verification failed",
-    "saveFailed": "Failed to save profile"
   },
   "validation": {
     "usernameRequired": "Username is required",
     "valorantNameRequired": "Valorant name is required",
     "valorantTagRequired": "Valorant tag is required",
     "invalidTag": "Tag must be 3-5 digits"
+  },
+  "messages": {
+    "verificationSuccess": "Player verified successfully!",
+    "verificationFailed": "Failed to verify player. Please check your Riot ID.",
+    "accountLinked": "Riot account linked successfully!",
+    "profileSaved": "Profile saved successfully!",
+    "saveFailed": "Failed to save profile. Please try again."
   }
 }

@@ -26,12 +26,17 @@
   "profile": {
     "saveFailed": "Error al guardar cambios del perfil.",
     "verificationFailed": "Error en la verificación del jugador.",
-    "linkFailed": "Error al vincular cuenta de Riot."
+    "linkFailed": "Error al vincular cuenta de Riot.",
+    "loadFailed": "Error al cargar perfil"
   },
   "subscription": {
     "upgradeFailed": "Error al mejorar suscripción.",
     "cancelFailed": "Error al cancelar suscripción.",
     "paymentFailed": "Error en el procesamiento del pago."
+  },
+  "network": {
+    "connectionError": "Error de conexión. Por favor intenta de nuevo.",
+    "serverError": "Error del servidor. Por favor intenta más tarde."
   },
   "general": {
     "unexpectedError": "Ocurrió un error inesperado.",

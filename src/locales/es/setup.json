@@ -25,8 +25,8 @@
     "setupComplete": "¡Configuración completada exitosamente!",
     "redirecting": "Redirigiendo al panel...",
     "verificationSuccess": "¡Jugador verificado exitosamente!",
-    "setupFailed": "Error en la configuración. Por favor intenta de nuevo.",
-    "verificationFailed": "Error en la verificación del jugador. Por favor verifica tu Riot ID."
+    "verificationFailed": "Error al verificar jugador. Por favor verifica tu Riot ID.",
+    "setupFailed": "Error en la configuración. Por favor intenta de nuevo."
   },
   "playerInfo": {
     "accountLevel": "Nivel de Cuenta: {level}",

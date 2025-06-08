@@ -25,8 +25,8 @@
     "setupComplete": "Setup completed successfully!",
     "redirecting": "Redirecting to dashboard...",
     "verificationSuccess": "Player verified successfully!",
-    "setupFailed": "Setup failed. Please try again.",
-    "verificationFailed": "Player verification failed. Please check your Riot ID."
+    "verificationFailed": "Failed to verify player. Please check your Riot ID.",
+    "setupFailed": "Setup failed. Please try again."
   },
   "playerInfo": {
     "accountLevel": "Account Level: {level}",

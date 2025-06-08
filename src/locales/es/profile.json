@@ -21,21 +21,21 @@
   "actions": {
     "verify": "Verificar Jugador",
     "saveProfile": "Guardar Perfil",
-    "linkAccount": "Vincular Cuenta",
+    "linkAccount": "Vincular Cuenta de Riot",
     "verifying": "Verificando...",
     "saving": "Guardando..."
-  },
-  "messages": {
-    "verificationSuccess": "¡Jugador verificado exitosamente!",
-    "profileSaved": "¡Perfil guardado exitosamente!",
-    "accountLinked": "¡Riot ID vinculado exitosamente!",
-    "verificationFailed": "Error en la verificación del jugador",
-    "saveFailed": "Error al guardar el perfil"
   },
   "validation": {
     "usernameRequired": "El nombre de usuario es requerido",
     "valorantNameRequired": "El nombre de Valorant es requerido",
     "valorantTagRequired": "La etiqueta de Valorant es requerida",
     "invalidTag": "La etiqueta debe tener 3-5 dígitos"
+  },
+  "messages": {
+    "verificationSuccess": "¡Jugador verificado exitosamente!",
+    "verificationFailed": "Error al verificar jugador. Por favor verifica tu Riot ID.",
+    "accountLinked": "¡Cuenta de Riot vinculada exitosamente!",
+    "profileSaved": "¡Perfil guardado exitosamente!",
+    "saveFailed": "Error al guardar perfil. Por favor intenta de nuevo."
   }
 }
