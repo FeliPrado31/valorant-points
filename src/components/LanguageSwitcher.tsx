@@ -48,15 +48,15 @@ export default function LanguageSwitcher({
       const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
       console.log('🌐 LanguageSwitcher: Path without locale:', pathWithoutLocale);
 
-      // Navigate to new locale
-      const newPath = `/${newLocale}${pathWithoutLocale}`;
-      console.log('🌐 LanguageSwitcher: Navigating to:', newPath);
-      router.push(newPath);
-
-      // Store preference
+      // Store preference first
       document.cookie = `preferred-locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
       localStorage.setItem('preferred-locale', newLocale);
       console.log('🌐 LanguageSwitcher: Preference stored');
+
+      // Navigate to new locale
+      const newPath = `/${newLocale}${pathWithoutLocale}`;
+      console.log('🌐 LanguageSwitcher: Navigating to:', newPath);
+      router.replace(newPath);
     } catch (error) {
       console.error('❌ LanguageSwitcher: Error changing locale:', error);
     } finally {
