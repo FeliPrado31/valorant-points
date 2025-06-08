@@ -1,5 +1,47 @@
+<<<<<<< HEAD
 {
-  "_namespace": "errors",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "api": {
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "unauthorized": "Unauthorized access. Please sign in.",
+    "forbidden": "Access denied.",
+    "notFound": "Resource not found.",
+    "timeout": "Request timeout. Please try again.",
+    "rateLimited": "Too many requests. Please wait and try again."
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidRiotId": "Please enter a valid Riot ID (Username#TAG)",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be no more than {max} characters",
+    "invalidFormat": "Invalid format"
+  },
+  "missions": {
+    "acceptFailed": "Failed to accept mission. Please try again.",
+    "progressUpdateFailed": "Failed to update progress. Please try again.",
+    "noMissionsAvailable": "No missions available at this time.",
+    "missionNotFound": "Mission not found.",
+    "alreadyAccepted": "Mission already accepted."
+  },
+  "profile": {
+    "saveFailed": "Failed to save profile changes.",
+    "verificationFailed": "Player verification failed.",
+    "linkFailed": "Failed to link Riot account.",
+    "loadFailed": "Failed to load profile"
+  },
+  "subscription": {
+    "upgradeFailed": "Failed to upgrade subscription.",
+    "cancelFailed": "Failed to cancel subscription.",
+    "paymentFailed": "Payment processing failed."
+  },
+  "network": {
+    "connectionError": "Connection error. Please try again.",
+    "serverError": "Server error. Please try again later."
+  },
+  "general": {
+    "unexpectedError": "An unexpected error occurred.",
+    "tryAgain": "Please try again.",
+    "contactSupport": "If the problem persists, please contact support."
+  }
 }

@@ -1,5 +1,4 @@
 {
-  "_namespace": "missions",
   "difficulty": {
     "easy": "Easy",
     "medium": "Medium",
@@ -32,5 +31,10 @@
       "free": "Upgrade to Standard or Premium to access mission filters and search.",
       "standard": "Upgrade to Premium to access advanced mission filters and search."
     }
+  },
+  "actions": {
+    "acceptMission": "Accept Mission",
+    "viewProgress": "View Progress",
+    "completeMission": "Complete Mission"
   }
 }

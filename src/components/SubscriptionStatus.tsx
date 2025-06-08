@@ -6,6 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Crown, Clock, Zap, ArrowUp } from 'lucide-react';
+import {
+  useSubscriptionTranslations,
+  useTranslationHelpers
+} from '@/hooks/useI18n';
 
 interface SubscriptionInfo {
   tier: 'free' | 'standard' | 'premium';
@@ -31,6 +35,8 @@ interface SubscriptionStatusProps {
 export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProps) {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = useSubscriptionTranslations();
+  const { formatNumber } = useTranslationHelpers();
 
   useEffect(() => {
     fetchSubscriptionInfo();
@@ -81,15 +87,14 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
   const getTierColor = (tier: string) => {
     switch (tier) {
       case 'premium':
-        return 'bg-yellow-600 hover:bg-yellow-700';
+        return 'bg-yellow-600 text-white';
       case 'standard':
-        return 'bg-blue-600 hover:bg-blue-700';
+        return 'bg-blue-600 text-white';
       default:
-        return 'bg-gray-600 hover:bg-gray-700';
+        return 'bg-gray-600 text-white';
     }
   };
 
-  const missionProgress = (subscriptionInfo.activeMissionsCount / subscriptionInfo.maxActiveMissions) * 100;
   const slotProgress = ((subscriptionInfo.tierInfo.maxActiveMissions - subscriptionInfo.availableSlots) / subscriptionInfo.tierInfo.maxActiveMissions) * 100;
 
   return (
@@ -99,10 +104,13 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
           <div className="flex items-center space-x-2">
             {getTierIcon(subscriptionInfo.tier)}
             <CardTitle className="text-white text-base sm:text-lg">
-              {subscriptionInfo.tierInfo.name} Plan
+              {t(`plans.${subscriptionInfo.tier}.name`)} {t('status.currentPlan')}
             </CardTitle>
             <Badge className={`${getTierColor(subscriptionInfo.tier)} text-xs sm:text-sm`}>
-              {subscriptionInfo.tier === 'free' ? 'Free' : `$${subscriptionInfo.tierInfo.price}/month`}
+              {subscriptionInfo.tier === 'free'
+                ? t('billing.free')
+                : `${t('billing.price', { price: subscriptionInfo.tierInfo.price })}${t('billing.monthly')}`
+              }
             </Badge>
           </div>
           {subscriptionInfo.tier === 'free' && (
@@ -112,37 +120,23 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
               className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
             >
               <ArrowUp className="h-4 w-4 mr-1" />
-              Upgrade
+              {t('actions.upgrade')}
             </Button>
           )}
         </div>
-        <CardDescription className="text-gray-300 text-sm">
-          Manage your mission limits and subscription
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Active Missions */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-300">Active Missions</span>
-            <span className="text-white font-medium">
-              {subscriptionInfo.activeMissionsCount} / {subscriptionInfo.maxActiveMissions}
-            </span>
-          </div>
-          <Progress value={missionProgress} className="h-2" />
-          {subscriptionInfo.activeMissionsCount >= subscriptionInfo.maxActiveMissions && (
-            <p className="text-yellow-400 text-xs">
-              Mission limit reached. {subscriptionInfo.tier === 'free' ? 'Upgrade for more missions!' : 'Complete missions to free up slots.'}
-            </p>
-          )}
-        </div>
+      <CardContent>
+        {/* Plan Description */}
+        <CardDescription className="text-gray-300 mb-4">
+          {t(`plans.${subscriptionInfo.tier}.description`)}
+        </CardDescription>
 
         {/* Daily Slots */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-300">Daily Slots Used</span>
+            <span className="text-gray-300">{t('status.dailySlotsUsed')}</span>
             <span className="text-white font-medium">
-              {subscriptionInfo.tierInfo.maxActiveMissions - subscriptionInfo.availableSlots} / {subscriptionInfo.tierInfo.maxActiveMissions}
+              {formatNumber(subscriptionInfo.tierInfo.maxActiveMissions - subscriptionInfo.availableSlots)} / {formatNumber(subscriptionInfo.tierInfo.maxActiveMissions)}
             </span>
           </div>
           <Progress value={slotProgress} className="h-2" />
@@ -150,39 +144,31 @@ export default function SubscriptionStatus({ onUpgrade }: SubscriptionStatusProp
             <div className="flex items-center space-x-1 text-xs text-orange-400">
               <Clock className="h-3 w-3" />
               <span>
-                Daily limit reached. Resets in {subscriptionInfo.hoursUntilRefresh} hours
+                {t('status.dailyLimitReached', { hours: formatNumber(subscriptionInfo.hoursUntilRefresh) })}
               </span>
             </div>
           )}
         </div>
 
-        {/* Mission Status */}
-        <div className="pt-2 border-t border-slate-700">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-300">Can Accept Missions</span>
-            <Badge variant={subscriptionInfo.canAcceptMissions ? "default" : "destructive"}>
-              {subscriptionInfo.canAcceptMissions ? "Yes" : "No"}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Upgrade Prompt for Free Users */}
-        {subscriptionInfo.tier === 'free' && (
-          <div className="pt-2 border-t border-slate-700">
-            <div className="text-center space-y-3">
-              <p className="text-sm text-gray-300">
-                Want more missions? Upgrade your plan!
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <div className="bg-slate-700/50 p-3 rounded-lg">
-                  <div className="text-blue-400 font-medium">Standard</div>
-                  <div className="text-gray-300">5 missions • $3/month</div>
-                </div>
-                <div className="bg-slate-700/50 p-3 rounded-lg">
-                  <div className="text-yellow-400 font-medium">Premium</div>
-                  <div className="text-gray-300">10 missions • $10/month</div>
-                </div>
+        {/* Upgrade Suggestion for Free Users */}
+        {subscriptionInfo.tier === 'free' && subscriptionInfo.availableSlots <= 1 && (
+          <div className="mt-4 p-3 bg-blue-900/30 border border-blue-700 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-300 text-sm font-medium">
+                  {t('status.upgradeAvailable')}
+                </p>
+                <p className="text-blue-200 text-xs">
+                  {t('plans.standard.description')}
+                </p>
               </div>
+              <Button
+                onClick={onUpgrade}
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {t('actions.upgrade')}
+              </Button>
             </div>
           </div>
         )}

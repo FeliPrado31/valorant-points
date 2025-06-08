@@ -1,5 +1,42 @@
+<<<<<<< HEAD
 {
-  "_namespace": "profile",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "title": "Configuración del Perfil",
+  "description": "Configura tu perfil y conecta tu cuenta de Valorant para comenzar a rastrear misiones.",
+  "sections": {
+    "basicInfo": "Información Básica",
+    "valorantAccount": "Cuenta de Valorant",
+    "verification": "Verificación de Cuenta"
+  },
+  "fields": {
+    "username": "Nombre de Usuario",
+    "valorantName": "Nombre de Valorant",
+    "valorantTag": "Etiqueta de Valorant",
+    "riotId": "Riot ID",
+    "email": "Dirección de Correo"
+  },
+  "placeholders": {
+    "username": "Ingresa tu nombre de usuario",
+    "valorantName": "Ingresa tu nombre de Valorant",
+    "valorantTag": "Ingresa tu etiqueta (ej. 1234)"
+  },
+  "actions": {
+    "verify": "Verificar Jugador",
+    "saveProfile": "Guardar Perfil",
+    "linkAccount": "Vincular Cuenta de Riot",
+    "verifying": "Verificando...",
+    "saving": "Guardando..."
+  },
+  "validation": {
+    "usernameRequired": "El nombre de usuario es requerido",
+    "valorantNameRequired": "El nombre de Valorant es requerido",
+    "valorantTagRequired": "La etiqueta de Valorant es requerida",
+    "invalidTag": "La etiqueta debe tener 3-5 dígitos"
+  },
+  "messages": {
+    "verificationSuccess": "¡Jugador verificado exitosamente!",
+    "verificationFailed": "Error al verificar jugador. Por favor verifica tu Riot ID.",
+    "accountLinked": "¡Cuenta de Riot vinculada exitosamente!",
+    "profileSaved": "¡Perfil guardado exitosamente!",
+    "saveFailed": "Error al guardar perfil. Por favor intenta de nuevo."
+  }
 }

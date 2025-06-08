@@ -1,5 +1,32 @@
+<<<<<<< HEAD
 {
-  "_namespace": "navigation",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "brand": {
+    "name": "Misiones Valorant",
+    "shortName": "MV"
+  },
+  "items": {
+    "dashboard": {
+      "label": "Panel",
+      "description": "Ve tus misiones y progreso"
+    },
+    "profile": {
+      "label": "Perfil",
+      "description": "Gestiona la configuración de tu cuenta"
+    },
+    "subscription": {
+      "label": "Suscripción",
+      "description": "Gestiona tu plan de suscripción"
+    }
+  },
+  "actions": {
+    "refresh": "Actualizar",
+    "refreshProgress": "Actualizar Progreso",
+    "updateMissionProgress": "Actualizar progreso de misiones",
+    "toggleMenu": "Alternar menú de navegación"
+  },
+  "welcome": "¡Bienvenido, {name}!",
+  "mobileMenu": {
+    "open": "Abrir menú",
+    "close": "Cerrar menú"
+  }
 }

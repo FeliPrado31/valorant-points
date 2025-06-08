@@ -1,5 +1,43 @@
+<<<<<<< HEAD
 {
-  "_namespace": "dashboard",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "loading": "Cargando...",
+  "loadingDashboard": "Cargando panel...",
+  "welcome": {
+    "title": "¡Bienvenido de vuelta, {username}!",
+    "connectedRiotId": "Riot ID conectado: {riotId}",
+    "readyMessage": "¡Listo para completar misiones!"
+  },
+  "stats": {
+    "activeMissions": "Misiones Activas",
+    "completedMissions": "Misiones Completadas",
+    "totalPoints": "Puntos Totales",
+    "recentMatches": "Partidas Recientes"
+  },
+  "missions": {
+    "available": "Misiones Disponibles",
+    "noActiveMissions": "No hay misiones activas",
+    "acceptMission": "Aceptar Misión",
+    "target": "Objetivo: {target} {type}",
+    "reward": "Recompensa: {points} puntos",
+    "progress": "Progreso: {current}/{target}",
+    "accepted": "Aceptada: {date}",
+    "progressNote": "Solo las partidas jugadas después de la aceptación cuentan para el progreso",
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil"
+    }
+  },
+  "matches": {
+    "noMatches": "No se encontraron partidas recientes",
+    "loadingMatches": "Cargando partidas recientes...",
+    "matchDate": "Fecha de Partida",
+    "gameMode": "Modo de Juego",
+    "result": "Resultado"
+  },
+  "errors": {
+    "loadingFailed": "Error al cargar datos del panel",
+    "missionAcceptFailed": "Error al aceptar misión",
+    "refreshFailed": "Error al actualizar progreso"
+  }
 }
