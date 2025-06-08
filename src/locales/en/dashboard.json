@@ -1,5 +1,37 @@
 {
-  "_namespace": "dashboard",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "loading": "Loading...",
+  "loadingDashboard": "Loading dashboard...",
+  "welcome": {
+    "title": "Welcome back, {username}!",
+    "connectedRiotId": "Connected Riot ID: {riotId}",
+    "readyMessage": "Ready to complete missions!"
+  },
+  "stats": {
+    "activeMissions": "Active Missions",
+    "completedMissions": "Completed Missions",
+    "totalPoints": "Total Points",
+    "recentMatches": "Recent Matches"
+  },
+  "missions": {
+    "available": "Available Missions",
+    "noActiveMissions": "No active missions. Start a new mission below!",
+    "acceptMission": "Accept Mission",
+    "target": "Target: {target} {type}",
+    "reward": "Reward: {points} points",
+    "progress": "{current}/{target}",
+    "accepted": "Accepted: {date}",
+    "progressNote": "Only matches played after acceptance count toward progress"
+  },
+  "matches": {
+    "noMatches": "No recent matches found. Play some Valorant to see your match history!",
+    "loadingMatches": "Loading recent matches...",
+    "matchDate": "Match Date",
+    "gameMode": "Game Mode",
+    "result": "Result"
+  },
+  "errors": {
+    "loadingFailed": "Failed to load dashboard data",
+    "missionAcceptFailed": "Failed to accept mission",
+    "refreshFailed": "Failed to refresh progress"
+  }
 }

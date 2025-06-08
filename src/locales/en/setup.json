@@ -1,5 +1,4 @@
 {
-  "_namespace": "setup",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "title": "Setup",
+  "placeholder": "placeholder"
 }

@@ -1,5 +1,4 @@
 {
-  "_namespace": "setup",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "title": "Configuración",
+  "placeholder": "placeholder"
 }

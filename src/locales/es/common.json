@@ -1,5 +1,75 @@
 {
-  "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "continue": "Continuar",
+    "refresh": "Actualizar",
+    "upgrade": "Mejorar",
+    "getStarted": "Comenzar",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "loading": "Cargando...",
+    "retry": "Reintentar",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "confirm": "Confirmar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "view": "Ver",
+    "download": "Descargar"
+  },
+  "labels": {
+    "progress": "Progreso",
+    "status": "Estado",
+    "date": "Fecha",
+    "time": "Hora",
+    "name": "Nombre",
+    "email": "Correo",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "all": "Todos",
+    "none": "Ninguno",
+    "yes": "Sí",
+    "no": "No",
+    "optional": "Opcional",
+    "required": "Requerido",
+    "note": "Nota",
+    "features": "Características"
+  },
+  "messages": {
+    "success": "¡Éxito!",
+    "error": "Ocurrió un error",
+    "warning": "Advertencia",
+    "info": "Información",
+    "loading": "Cargando...",
+    "noData": "No hay datos disponibles",
+    "comingSoon": "Próximamente",
+    "maintenance": "En mantenimiento"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "help": "Ayuda",
+    "logout": "Cerrar Sesión",
+    "menu": "Menú"
+  },
+  "time": {
+    "now": "Ahora",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "thisWeek": "Esta semana",
+    "lastWeek": "Semana pasada",
+    "thisMonth": "Este mes",
+    "lastMonth": "Mes pasado"
+  }
 }
