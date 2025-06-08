@@ -1,0 +1,64 @@
+{
+  "title": "Subscription Management",
+  "description": "Manage your subscription and unlock more missions",
+  "plans": {
+    "free": {
+      "name": "Free",
+      "description": "Basic mission tracking",
+      "features": [
+        "Up to 3 active missions",
+        "Basic progress tracking",
+        "Community support"
+      ]
+    },
+    "standard": {
+      "name": "Standard",
+      "description": "Enhanced mission experience",
+      "features": [
+        "Up to 7 active missions",
+        "Advanced mission tracking",
+        "Daily mission refresh",
+        "Advanced statistics",
+        "Priority support",
+        "Mission filters"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Ultimate mission experience",
+      "features": [
+        "Unlimited active missions",
+        "Advanced mission tracking",
+        "Daily mission refresh",
+        "Advanced analytics",
+        "Premium support",
+        "Early access features",
+        "Exclusive missions"
+      ]
+    },
+    "comparison": "Choose Your Plan"
+  },
+  "billing": {
+    "monthly": "/month",
+    "free": "Free",
+    "price": "${price}",
+    "popular": "Most Popular",
+    "completeSubscription": "Complete Your Subscription",
+    "choosePaymentMethod": "Choose your payment method and complete the subscription process",
+    "choosePlan": "Unlock more missions and features with our subscription plans"
+  },
+  "actions": {
+    "upgrade": "Upgrade Plan",
+    "manageBilling": "Manage Billing",
+    "cancelSubscription": "Cancel Subscription",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "downgrade": "Downgrade"
+  },
+  "status": {
+    "currentPlan": "Current Plan",
+    "dailySlotsUsed": "Daily Slots Used",
+    "dailyLimitReached": "Daily limit reached. Resets in {hours} hours",
+    "upgradeAvailable": "Want more missions? Upgrade your plan!"
+  }
+}

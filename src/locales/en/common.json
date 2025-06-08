@@ -1,0 +1,139 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "refresh": "Refresh",
+    "upgrade": "Upgrade",
+    "getStarted": "Get Started",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "accept": "Accept",
+    "decline": "Decline",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "download": "Download"
+  },
+  "labels": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "date": "Date",
+    "time": "Time",
+    "status": "Status",
+    "progress": "Progress",
+    "name": "Name",
+    "title": "Title",
+    "description": "Description",
+    "type": "Type",
+    "category": "Category",
+    "location": "Location",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "discount": "Discount",
+    "features": "Features"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed",
+    "pending": "Pending",
+    "failed": "Failed",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "cancelled": "Cancelled",
+    "expired": "Expired",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "time": {
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months",
+    "years": "years",
+    "ago": "ago",
+    "now": "now",
+    "today": "today",
+    "yesterday": "yesterday",
+    "tomorrow": "tomorrow"
+  },
+  "numbers": {
+    "first": "first",
+    "second": "second",
+    "third": "third",
+    "last": "last",
+    "total": "total",
+    "count": "count"
+  },
+  "messages": {
+    "success": "Success!",
+    "error": "Error occurred",
+    "warning": "Warning",
+    "info": "Information",
+    "loading": "Loading...",
+    "noData": "No data available",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "serverError": "Server error"
+  },
+  "home": {
+    "hero": {
+      "title": "Level Up Your {valorant} Game",
+      "subtitle": "Complete challenging missions based on your real Valorant gameplay. Track your progress, earn rewards, and compete with other players.",
+      "cta": "Start Your Journey"
+    },
+    "features": {
+      "realTime": {
+        "title": "Real-Time Missions",
+        "description": "Complete missions like \"Get 10 headshots\" or \"Win 5 Spike Rush games\" based on your actual Valorant match data."
+      },
+      "rewards": {
+        "title": "Earn Rewards",
+        "description": "Gain points and unlock achievements as you complete missions. Track your progress and celebrate your victories."
+      },
+      "compete": {
+        "title": "Compete & Compare",
+        "description": "See how you stack up against other players on the leaderboard. Challenge friends and climb the ranks."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "steps": {
+        "connect": {
+          "title": "Connect Your Account",
+          "description": "Link your Valorant account by providing your Riot ID and tag."
+        },
+        "choose": {
+          "title": "Choose Missions",
+          "description": "Select from various missions tailored to your skill level and playstyle."
+        },
+        "play": {
+          "title": "Play & Progress",
+          "description": "Play Valorant normally and watch your mission progress update automatically."
+        }
+      }
+    }
+  }
+}

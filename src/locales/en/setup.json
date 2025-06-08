@@ -1,0 +1,37 @@
+
+{
+  "title": "Welcome to Valorant Missions!",
+  "description": "To start tracking your missions and progress, we need to connect your Valorant account.",
+  "steps": {
+    "verification": "Player Verification",
+    "completion": "Complete Setup"
+  },
+  "instructions": {
+    "enterRiotId": "Enter your Riot ID to verify your Valorant account",
+    "format": "Format: Username#TAG (e.g., Player#1234)",
+    "note": "Your Riot ID will be used to track your Valorant matches and update mission progress automatically."
+  },
+  "fields": {
+    "username": "Username",
+    "valorantName": "Riot ID",
+    "valorantTag": "Tag"
+  },
+  "actions": {
+    "completeSetup": "Complete Setup & Start Missions",
+    "verifyPlayer": "Verify Player",
+    "setupInProgress": "Setting up...",
+    "verifying": "Verifying..."
+  },
+  "messages": {
+    "setupComplete": "Setup completed successfully!",
+    "redirecting": "Redirecting to dashboard...",
+    "verificationSuccess": "Player verified successfully!",
+    "verificationFailed": "Failed to verify player. Please check your Riot ID.",
+    "setupFailed": "Setup failed. Please try again."
+  },
+  "playerInfo": {
+    "accountLevel": "Level {level}",
+    "region": "{region}",
+    "lastUpdate": "Last updated: {date}"
+  }
+}

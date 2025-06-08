@@ -164,3 +164,59 @@ export const FILTER_OPTIONS = {
     { value: 'completed', label: 'Completed' },
   ],
 } as const;
+
+// Add translation-aware filter options
+export const getTranslatedFilterOptions = (t: (key: string) => string) => ({
+  difficulty: [
+    { value: 'all', label: t('common.labels.all') },
+    { value: 'easy', label: t('missions.difficulty.easy') },
+    { value: 'medium', label: t('missions.difficulty.medium') },
+    { value: 'hard', label: t('missions.difficulty.hard') }
+  ],
+  type: [
+    { value: 'all', label: t('common.labels.all') },
+    { value: 'kills', label: t('missions.types.kills') },
+    { value: 'headshots', label: t('missions.types.headshots') },
+    { value: 'gamemode', label: t('missions.types.gamemode') },
+    { value: 'weapon', label: t('missions.types.weapon') },
+    { value: 'rounds', label: t('missions.types.rounds') },
+    { value: 'wins', label: t('missions.types.wins') }
+  ]
+});
+
+// Helper function to get translated mission status
+export const getTranslatedMissionStatus = (status: string, t: (key: string) => string) => {
+  const statusMap: Record<string, string> = {
+    'available': t('missions.status.available'),
+    'active': t('missions.status.active'),
+    'completed': t('missions.status.completed'),
+    'expired': t('missions.status.expired')
+  };
+
+  return statusMap[status] || status;
+};
+
+// Helper function to get translated difficulty
+export const getTranslatedDifficulty = (difficulty: string, t: (key: string) => string) => {
+  const difficultyMap: Record<string, string> = {
+    'easy': t('missions.difficulty.easy'),
+    'medium': t('missions.difficulty.medium'),
+    'hard': t('missions.difficulty.hard')
+  };
+
+  return difficultyMap[difficulty] || difficulty;
+};
+
+// Helper function to get translated mission type
+export const getTranslatedMissionType = (type: string, t: (key: string) => string) => {
+  const typeMap: Record<string, string> = {
+    'kills': t('missions.types.kills'),
+    'headshots': t('missions.types.headshots'),
+    'gamemode': t('missions.types.gamemode'),
+    'weapon': t('missions.types.weapon'),
+    'rounds': t('missions.types.rounds'),
+    'wins': t('missions.types.wins')
+  };
+
+  return typeMap[type] || type;
+};

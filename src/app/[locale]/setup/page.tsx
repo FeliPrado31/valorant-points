@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +14,17 @@ import { Target, Globe, Save, AlertCircle } from 'lucide-react';
 export default function Setup() {
   const { user } = useUser();
   const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
+
+  // Translation hooks
+  const t = useTranslations('setup');
+  const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
+
+  // Debug: Log the current locale and translations
+  console.log('🌐 Setup Page - Current locale:', locale);
+  console.log('🌐 Setup Page - Title translation:', t('title'));
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
@@ -37,7 +49,7 @@ export default function Setup() {
           // If user already has a Riot ID, redirect to dashboard
           if (userData.riotId && userData.riotId.puuid) {
             console.log('🔒 Setup: User already has Riot ID, redirecting to dashboard');
-            router.push('/dashboard');
+            router.push(`/${locale}/dashboard`);
             return;
           }
         }
@@ -55,11 +67,11 @@ export default function Setup() {
         username: user.username || user.firstName || '',
       }));
     }
-  }, [user, router]);
+  }, [user, router, locale]);
 
   const verifyValorantPlayer = async () => {
     if (!formData.valorantName || !formData.valorantTag) {
-      setError('Please enter both Riot ID and tag');
+      setError(tErrors('validation.invalidRiotId'));
       return;
     }
 
@@ -85,13 +97,13 @@ export default function Setup() {
         setError('');
       } else {
         const errorData = await response.json();
-        setError(`Verification failed: ${errorData.error}`);
+        setError(`${t('messages.verificationFailed')}: ${errorData.error}`);
         setPlayerVerified(false);
         setPlayerData(null);
       }
     } catch (error) {
       console.error('Error verifying player:', error);
-      setError('Error verifying Valorant account. Please try again.');
+      setError(tErrors('profile.verificationFailed'));
       setPlayerVerified(false);
       setPlayerData(null);
     } finally {
@@ -101,12 +113,12 @@ export default function Setup() {
 
   const completeSetup = async () => {
     if (!playerVerified || !playerData) {
-      setError('Please verify your Valorant account first');
+      setError(tErrors('profile.verificationFailed'));
       return;
     }
 
     if (!formData.username.trim()) {
-      setError('Please enter a username');
+      setError(tErrors('validation.required'));
       return;
     }
 
@@ -127,14 +139,14 @@ export default function Setup() {
 
       if (response.ok) {
         // Setup completed successfully, redirect to dashboard
-        router.push('/dashboard');
+        router.push(`/${locale}/dashboard`);
       } else {
         const errorData = await response.json();
-        setError(`Error saving profile: ${errorData.error}`);
+        setError(`${tErrors('profile.saveFailed')}: ${errorData.error}`);
       }
     } catch (error) {
       console.error('Error completing setup:', error);
-      setError('Error completing setup. Please try again.');
+      setError(t('messages.setupFailed'));
     } finally {
       setLoading(false);
     }
@@ -144,7 +156,7 @@ export default function Setup() {
   if (checkingAccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Checking access...</div>
+        <div className="text-white text-xl">{tCommon('status.loading')}</div>
       </div>
     );
   }
@@ -162,9 +174,9 @@ export default function Setup() {
       <div className="container mx-auto px-6 py-8 max-w-2xl">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader className="text-center">
-            <CardTitle className="text-white text-3xl mb-2">Welcome to Valorant Missions!</CardTitle>
+            <CardTitle className="text-white text-3xl mb-2">{t('title')}</CardTitle>
             <CardDescription className="text-gray-300 text-lg">
-              To start tracking your missions and progress, we need to connect your Valorant account.
+              {t('description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -178,16 +190,16 @@ export default function Setup() {
 
             {/* Basic Info */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-white">{tCommon('labels.name')}</h3>
 
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-white">Username</Label>
+                <Label htmlFor="username" className="text-white">{t('fields.username')}</Label>
                 <Input
                   id="username"
                   value={formData.username}
                   onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                   className="bg-slate-700 border-slate-600 text-white"
-                  placeholder="Enter your username"
+                  placeholder={t('fields.username')}
                   required
                 />
               </div>
@@ -195,14 +207,14 @@ export default function Setup() {
 
             {/* Valorant Account */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">Valorant Account</h3>
+              <h3 className="text-lg font-semibold text-white">{t('fields.valorantName')}</h3>
               <p className="text-gray-400 text-sm">
-                We need your Riot ID to track your matches and update mission progress.
+                {t('instructions.enterRiotId')}
               </p>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="valorantName" className="text-white">Riot ID</Label>
+                  <Label htmlFor="valorantName" className="text-white">{t('fields.valorantName')}</Label>
                   <Input
                     id="valorantName"
                     value={formData.valorantName}
@@ -219,7 +231,7 @@ export default function Setup() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="valorantTag" className="text-white">Tag</Label>
+                  <Label htmlFor="valorantTag" className="text-white">{t('fields.valorantTag')}</Label>
                   <Input
                     id="valorantTag"
                     value={formData.valorantTag}
@@ -246,13 +258,13 @@ export default function Setup() {
                   className="text-white border-slate-600 hover:bg-slate-800"
                 >
                   <Globe className={`h-4 w-4 mr-2 ${verifying ? 'animate-spin' : ''}`} />
-                  {verifying ? 'Verifying...' : 'Verify Account'}
+                  {verifying ? t('actions.verifying') : t('actions.verifyPlayer')}
                 </Button>
 
                 {playerVerified && (
                   <div className="text-green-400 text-sm flex items-center space-x-1">
                     <span>✓</span>
-                    <span>Account verified</span>
+                    <span>{t('messages.verificationSuccess')}</span>
                   </div>
                 )}
               </div>
@@ -262,7 +274,7 @@ export default function Setup() {
             {playerVerified && playerData && (
               <div className="space-y-4">
                 <div className="border-t border-slate-600 pt-6">
-                  <h3 className="text-white text-lg font-semibold mb-4">Confirm Your Valorant Account</h3>
+                  <h3 className="text-white text-lg font-semibold mb-4">{t('steps.verification')}</h3>
 
                   <div className="bg-slate-700/50 rounded-lg p-4 space-y-4">
                     {/* Player Info */}
@@ -272,10 +284,10 @@ export default function Setup() {
                           {playerData.name}#{playerData.tag}
                         </div>
                         <div className="text-gray-300 text-sm">
-                          Level {playerData.accountLevel} • {playerData.region.toUpperCase()}
+                          {t('playerInfo.accountLevel', { level: playerData.accountLevel })} • {t('playerInfo.region', { region: playerData.region.toUpperCase() })}
                         </div>
                         <div className="text-gray-400 text-xs">
-                          Last updated: {playerData.lastUpdate}
+                          {t('playerInfo.lastUpdate', { date: playerData.lastUpdate })}
                         </div>
                       </div>
                     </div>
@@ -299,7 +311,7 @@ export default function Setup() {
 
                     <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3">
                       <div className="text-blue-300 text-sm">
-                        ✓ This is your Valorant account. Once linked, it cannot be changed or transferred to another user.
+                        ✓ {t('instructions.note')}
                       </div>
                     </div>
                   </div>
@@ -315,12 +327,12 @@ export default function Setup() {
                 className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-3"
               >
                 <Save className={`h-5 w-5 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Setting up...' : 'Complete Setup & Start Missions'}
+                {loading ? t('actions.setupInProgress') : t('actions.completeSetup')}
               </Button>
             </div>
 
             <div className="text-center text-gray-400 text-sm">
-              Your Riot ID will be used to track your Valorant matches and update mission progress automatically.
+              {t('instructions.note')}
             </div>
           </CardContent>
         </Card>

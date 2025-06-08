@@ -1,0 +1,31 @@
+{
+  "brand": {
+    "name": "Valorant Missions",
+    "shortName": "VM"
+  },
+  "items": {
+    "dashboard": {
+      "label": "Dashboard",
+      "description": "View your missions and progress"
+    },
+    "profile": {
+      "label": "Profile",
+      "description": "Manage your account settings"
+    },
+    "subscription": {
+      "label": "Subscription",
+      "description": "Manage your subscription plan"
+    }
+  },
+  "actions": {
+    "refresh": "Refresh",
+    "refreshProgress": "Refresh Progress",
+    "updateMissionProgress": "Update mission progress",
+    "toggleMenu": "Toggle navigation menu"
+  },
+  "welcome": "Welcome, {name}!",
+  "mobileMenu": {
+    "open": "Open menu",
+    "close": "Close menu"
+  }
+}

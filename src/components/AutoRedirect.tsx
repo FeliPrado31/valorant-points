@@ -1,12 +1,15 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
+import { useLocale } from 'next-intl';
 
 export default function AutoRedirect() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
   const [checking, setChecking] = useState(false);
 
   const checkUserSetup = useCallback(async () => {
@@ -15,22 +18,22 @@ export default function AutoRedirect() {
       if (response.ok) {
         const userData = await response.json();
         if (userData.riotId && userData.riotId.puuid) {
-          // User has completed setup, redirect to dashboard
-          router.push('/dashboard');
+          // User has completed setup, redirect to localized dashboard
+          router.push(`/${locale}/dashboard`);
         } else {
-          // User needs to complete setup
-          router.push('/setup');
+          // User needs to complete setup, redirect to localized setup
+          router.push(`/${locale}/setup`);
         }
       } else {
-        // User doesn't exist in our system, redirect to setup
-        router.push('/setup');
+        // User doesn't exist in our system, redirect to localized setup
+        router.push(`/${locale}/setup`);
       }
     } catch (error) {
       console.error('Error checking user setup:', error);
-      // On error, redirect to setup to be safe
-      router.push('/setup');
+      // On error, redirect to localized setup to be safe
+      router.push(`/${locale}/setup`);
     }
-  }, [router]);
+  }, [router, locale]);
 
   useEffect(() => {
     if (isLoaded && user && !checking) {
