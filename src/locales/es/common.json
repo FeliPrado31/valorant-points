@@ -1,5 +1,73 @@
 {
-  "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "buttons": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "continue": "Continuar",
+    "refresh": "Actualizar",
+    "upgrade": "Mejorar",
+    "getStarted": "Comenzar",
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "loading": "Cargando...",
+    "retry": "Reintentar",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "confirm": "Confirmar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "view": "Ver",
+    "download": "Descargar"
+  },
+  "labels": {
+    "username": "Nombre de usuario",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "date": "Fecha",
+    "status": "Estado",
+    "progress": "Progreso",
+    "name": "Nombre",
+    "description": "Descripción",
+    "type": "Tipo",
+    "category": "Categoría"
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "completed": "Completado",
+    "pending": "Pendiente",
+    "failed": "Fallido",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "time": {
+    "hours": "horas",
+    "minutes": "minutos",
+    "seconds": "segundos",
+    "days": "días",
+    "weeks": "semanas",
+    "months": "meses",
+    "years": "años",
+    "ago": "hace",
+    "now": "ahora",
+    "today": "hoy",
+    "yesterday": "ayer",
+    "tomorrow": "mañana"
+  },
+  "numbers": {
+    "first": "primero",
+    "second": "segundo",
+    "third": "tercero",
+    "last": "último",
+    "total": "total",
+    "count": "cantidad"
+  }
 }

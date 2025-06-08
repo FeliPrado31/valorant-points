@@ -1,5 +1,41 @@
 {
-  "_namespace": "profile",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "title": "Profile Settings",
+  "description": "Configure your profile and connect your Valorant account to start tracking missions.",
+  "sections": {
+    "basicInfo": "Basic Information",
+    "valorantAccount": "Valorant Account",
+    "verification": "Account Verification"
+  },
+  "fields": {
+    "username": "Username",
+    "valorantName": "Valorant Name",
+    "valorantTag": "Valorant Tag",
+    "riotId": "Riot ID",
+    "email": "Email Address"
+  },
+  "placeholders": {
+    "username": "Enter your username",
+    "valorantName": "Enter your Valorant name",
+    "valorantTag": "Enter your tag (e.g., 1234)"
+  },
+  "actions": {
+    "verify": "Verify Player",
+    "saveProfile": "Save Profile",
+    "linkAccount": "Link Account",
+    "verifying": "Verifying...",
+    "saving": "Saving..."
+  },
+  "messages": {
+    "verificationSuccess": "Player verified successfully!",
+    "profileSaved": "Profile saved successfully!",
+    "accountLinked": "Riot ID linked successfully!",
+    "verificationFailed": "Player verification failed",
+    "saveFailed": "Failed to save profile"
+  },
+  "validation": {
+    "usernameRequired": "Username is required",
+    "valorantNameRequired": "Valorant name is required",
+    "valorantTagRequired": "Valorant tag is required",
+    "invalidTag": "Tag must be 3-5 digits"
+  }
 }

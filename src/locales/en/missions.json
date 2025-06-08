@@ -1,5 +1,35 @@
 {
-  "_namespace": "missions",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "types": {
+    "kills": "kills",
+    "headshots": "headshots",
+    "gamemode": "gamemode",
+    "weapon": "weapon",
+    "rounds": "rounds",
+    "wins": "wins"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "filters": {
+    "searchPlaceholder": "Search missions...",
+    "filterBy": "Filter by",
+    "difficulty": "Difficulty",
+    "type": "Type",
+    "clearFilters": "Clear Filters",
+    "showingResults": "Showing {count} of {total} missions",
+    "noResults": "No missions found matching your criteria"
+  },
+  "actions": {
+    "acceptMission": "Accept Mission",
+    "viewProgress": "View Progress",
+    "completeMission": "Complete Mission"
+  },
+  "status": {
+    "available": "Available",
+    "active": "Active",
+    "completed": "Completed",
+    "expired": "Expired"
+  }
 }

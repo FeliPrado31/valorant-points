@@ -1,5 +1,54 @@
 {
-  "_namespace": "subscription",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "title": "Gestión de Suscripción",
+  "description": "Gestiona tu suscripción y desbloquea más misiones",
+  "plans": {
+    "free": {
+      "name": "Gratis",
+      "description": "Seguimiento básico de misiones",
+      "features": [
+        "Hasta 3 misiones activas",
+        "Seguimiento básico de progreso",
+        "Soporte de la comunidad"
+      ]
+    },
+    "standard": {
+      "name": "Estándar",
+      "description": "Experiencia mejorada de misiones",
+      "features": [
+        "Hasta 7 misiones activas",
+        "Estadísticas avanzadas",
+        "Soporte prioritario",
+        "Filtros de misiones"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Experiencia definitiva de misiones",
+      "features": [
+        "Misiones activas ilimitadas",
+        "Análisis avanzados",
+        "Soporte premium",
+        "Acceso anticipado a funciones"
+      ]
+    }
+  },
+  "status": {
+    "currentPlan": "Plan Actual",
+    "dailySlotsUsed": "Espacios Diarios Usados",
+    "dailyLimitReached": "Límite diario alcanzado. Se reinicia en {hours} horas",
+    "upgradeAvailable": "Mejora disponible"
+  },
+  "actions": {
+    "upgrade": "Mejorar Plan",
+    "manageBilling": "Gestionar Facturación",
+    "cancelSubscription": "Cancelar Suscripción",
+    "selectPlan": "Seleccionar Plan",
+    "currentPlan": "Plan Actual"
+  },
+  "billing": {
+    "monthly": "/mes",
+    "free": "Gratis",
+    "price": "${price}",
+    "popular": "Más Popular"
+  }
 }
