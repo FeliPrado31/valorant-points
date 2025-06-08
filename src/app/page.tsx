@@ -1,20 +1,16 @@
-import { SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Container } from '@/components/ui/container';
 import { Grid } from '@/components/ui/grid';
 import { Target, Trophy, Users } from 'lucide-react';
-import AutoRedirect from '@/components/AutoRedirect';
 
 export default async function Home() {
-  const { userId } = await auth();
+  // TODO: Implement Ko-fi based authentication
+  const userId = null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Auto redirect for authenticated users */}
-      {userId && <AutoRedirect />}
 
       {/* Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-slate-900/95 backdrop-blur-md supports-[backdrop-filter]:bg-slate-900/80">
@@ -28,31 +24,18 @@ export default async function Home() {
               </span>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {userId ? (
-                <>
-                  <Link href="/dashboard">
-                    <Button variant="ghost-light" className="text-sm sm:text-base px-3 sm:px-4 py-2">
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <UserButton />
-                </>
-              ) : (
-                <>
-                  <SignInButton mode="modal">
-                    <Button variant="ghost-light" className="text-sm sm:text-base px-3 sm:px-4 py-2">
-                      <span className="hidden sm:inline">Sign In</span>
-                      <span className="sm:hidden">Sign In</span>
-                    </Button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
-                    <Button className="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 sm:px-4 py-2">
-                      <span className="hidden sm:inline">Get Started</span>
-                      <span className="sm:hidden">Start</span>
-                    </Button>
-                  </SignUpButton>
-                </>
-              )}
+              <Link href="/auth/signin">
+                <Button variant="ghost-light" className="text-sm sm:text-base px-3 sm:px-4 py-2">
+                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="sm:hidden">Sign In</span>
+                </Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button className="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 sm:px-4 py-2">
+                  <span className="hidden sm:inline">Get Started</span>
+                  <span className="sm:hidden">Start</span>
+                </Button>
+              </Link>
             </div>
           </div>
         </Container>
@@ -68,13 +51,11 @@ export default async function Home() {
             Complete challenging missions based on your real Valorant gameplay.
             Track your progress, earn rewards, and compete with other players.
           </p>
-          {!userId && (
-            <SignUpButton mode="modal">
-              <Button size="xl" className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
-                Start Your Journey
-              </Button>
-            </SignUpButton>
-          )}
+          <Link href="/auth/signup">
+            <Button size="xl" className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto">
+              Start Your Journey
+            </Button>
+          </Link>
         </div>
 
         {/* Features */}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Target, Globe, Save, AlertCircle } from 'lucide-react';
 
 export default function Setup() {
-  const { user } = useUser();
+  // TODO: Implement Ko-fi authentication
+  const user = null;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -25,37 +25,11 @@ export default function Setup() {
   const [playerData, setPlayerData] = useState<{ name: string; tag: string; accountLevel: number; region: string; lastUpdate: string; card: { wide: string; large: string } } | null>(null);
   const [error, setError] = useState('');
 
-  // Check if user already has a Riot ID and redirect if they do
+  // TODO: Implement Ko-fi authentication check
   useEffect(() => {
-    const checkUserAccess = async () => {
-      if (!user) return;
-
-      try {
-        const response = await fetch('/api/users');
-        if (response.ok) {
-          const userData = await response.json();
-          // If user already has a Riot ID, redirect to dashboard
-          if (userData.riotId && userData.riotId.puuid) {
-            console.log('🔒 Setup: User already has Riot ID, redirecting to dashboard');
-            router.push('/dashboard');
-            return;
-          }
-        }
-      } catch (error) {
-        console.error('Error checking user access:', error);
-      } finally {
-        setCheckingAccess(false);
-      }
-    };
-
-    if (user) {
-      checkUserAccess();
-      setFormData(prev => ({
-        ...prev,
-        username: user.username || user.firstName || '',
-      }));
-    }
-  }, [user, router]);
+    // For now, just set checking access to false
+    setCheckingAccess(false);
+  }, []);
 
   const verifyValorantPlayer = async () => {
     if (!formData.valorantName || !formData.valorantTag) {

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { adminDb, User, getSubscriptionTier, getMaxActiveMissions, shouldRefreshMissionSlots, SUBSCRIPTION_TIERS, getTierFromClerkPlanId, getClerkPlanIdFromTier } from '@/lib/firebase-admin';
+import { adminDb, User, getSubscriptionTier, getMaxActiveMissions, shouldRefreshMissionSlots, SUBSCRIPTION_TIERS, getTierFromKofiTierId, getKofiTierIdFromTier } from '@/lib/firebase-admin';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // TODO: Implement Ko-fi authentication
+    // For now, get userId from headers or query params
+    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
     }
 
     // Get user document
@@ -131,30 +132,31 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // TODO: Implement Ko-fi authentication
+    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { tier, clerkSubscriptionId, planId } = body;
+    const { tier, kofiSubscriptionId, kofiTierId } = body;
 
-    // Validate tier or derive from planId
+    // Validate tier or derive from kofiTierId
     let finalTier = tier;
-    if (planId && !tier) {
-      finalTier = getTierFromClerkPlanId(planId);
+    if (kofiTierId && !tier) {
+      finalTier = getTierFromKofiTierId(kofiTierId);
     }
 
     if (!finalTier || !['free', 'standard', 'premium'].includes(finalTier)) {
-      return NextResponse.json({ error: 'Invalid subscription tier or plan ID' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid subscription tier or Ko-fi tier ID' }, { status: 400 });
     }
 
-    // Validate that the planId matches the tier
-    const expectedPlanId = getClerkPlanIdFromTier(finalTier);
-    if (finalTier !== 'free' && planId && planId !== expectedPlanId) {
+    // Validate that the kofiTierId matches the tier
+    const expectedKofiTierId = getKofiTierIdFromTier(finalTier);
+    if (finalTier !== 'free' && kofiTierId && kofiTierId !== expectedKofiTierId) {
       return NextResponse.json({
-        error: `Plan ID ${planId} does not match tier ${finalTier}. Expected: ${expectedPlanId}`
+        error: `Ko-fi tier ID ${kofiTierId} does not match tier ${finalTier}. Expected: ${expectedKofiTierId}`
       }, { status: 400 });
     }
 
@@ -168,14 +170,15 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const maxMissions = getMaxActiveMissions(finalTier);
     const nextRefresh = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    const finalPlanId = planId || getClerkPlanIdFromTier(finalTier);
+    const finalKofiTierId = kofiTierId || getKofiTierIdFromTier(finalTier);
 
     // Update user subscription and mission limits
     const updateData = {
       'subscription.tier': finalTier,
       'subscription.status': 'active',
-      'subscription.clerkSubscriptionId': clerkSubscriptionId || null,
-      'subscription.planId': finalPlanId,
+      'subscription.provider': 'kofi',
+      'subscription.kofiSubscriptionId': kofiSubscriptionId || null,
+      'subscription.kofiTierId': finalKofiTierId,
       'subscription.currentPeriodStart': now,
       'missionLimits.maxActiveMissions': maxMissions,
       'missionLimits.availableSlots': maxMissions,
@@ -186,23 +189,23 @@ export async function POST(request: NextRequest) {
 
     await adminDb.collection('users').doc(userId).update(updateData);
 
-    console.log('✅ Subscription updated for user:', userId, {
+    console.log('✅ Ko-fi subscription updated for user:', userId, {
       tier: finalTier,
       maxMissions,
-      clerkSubscriptionId,
-      planId: finalPlanId,
-      expectedPlanId: getClerkPlanIdFromTier(finalTier)
+      kofiSubscriptionId,
+      kofiTierId: finalKofiTierId,
+      expectedKofiTierId: getKofiTierIdFromTier(finalTier)
     });
 
     return NextResponse.json({
       success: true,
       tier: finalTier,
       maxActiveMissions: maxMissions,
-      planId: finalPlanId,
+      kofiTierId: finalKofiTierId,
       message: `Subscription updated to ${SUBSCRIPTION_TIERS[finalTier as keyof typeof SUBSCRIPTION_TIERS].name}`
     });
   } catch (error) {
-    console.error('Error updating subscription:', error);
+    console.error('Error updating Ko-fi subscription:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

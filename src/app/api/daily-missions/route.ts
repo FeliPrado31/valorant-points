@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   adminDb,
   Mission,
@@ -10,12 +9,13 @@ import {
   generateDailyMissionSelection
 } from '@/lib/firebase-admin';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // TODO: Implement Ko-fi authentication
+    const userId = request.headers.get('x-user-id') || request.nextUrl.searchParams.get('userId');
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized - User ID required' }, { status: 401 });
     }
 
     // Get user document

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -54,7 +53,8 @@ interface RecentMatch {
 }
 
 function DashboardContent() {
-  const { user } = useUser();
+  // TODO: Implement Ko-fi authentication
+  const user = null;
   const [userMissions, setUserMissions] = useState<UserMission[]>([]);
   const [availableMissions, setAvailableMissions] = useState<Mission[]>([]);
   const [userProfile, setUserProfile] = useState<{ username: string; valorantTag: string; riotId?: { puuid: string; region: string }; subscription?: { tier: string } } | null>(null);

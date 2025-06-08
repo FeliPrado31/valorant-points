@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +8,6 @@ import { Container } from '@/components/ui/container';
 import { Grid } from '@/components/ui/grid';
 import Navigation from '@/components/Navigation';
 import { Target, Crown, Zap } from 'lucide-react';
-import { PricingTable, UserProfile } from '@clerk/nextjs';
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
 
 interface SubscriptionInfo {
@@ -30,7 +28,8 @@ interface SubscriptionInfo {
 }
 
 export default function SubscriptionPage() {
-  const { user } = useUser();
+  // TODO: Implement Ko-fi authentication
+  const user = null;
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPricingTable, setShowPricingTable] = useState(false);
@@ -64,24 +63,24 @@ export default function SubscriptionPage() {
         },
         body: JSON.stringify({
           tier: 'premium',
-          planId: 'cplan_2xb4qlrucukzKqSlMKtE7pvJdq9',
-          clerkSubscriptionId: 'sub_test_premium_manual'
+          kofiTierId: 'premium',
+          kofiSubscriptionId: 'sub_test_premium_manual'
         })
       });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Subscription updated:', result);
+        console.log('Ko-fi subscription updated:', result);
         // Refresh the subscription info
         await fetchSubscriptionInfo();
         alert('Successfully updated to Premium plan!');
       } else {
         const error = await response.text();
-        console.error('Failed to update subscription:', error);
+        console.error('Failed to update Ko-fi subscription:', error);
         alert('Failed to update subscription: ' + error);
       }
     } catch (error) {
-      console.error('Error updating subscription:', error);
+      console.error('Error updating Ko-fi subscription:', error);
       alert('Error updating subscription: ' + error);
     } finally {
       setUpdating(false);
@@ -223,32 +222,52 @@ export default function SubscriptionPage() {
               </div>
             )}
 
-            {/* Clerk Pricing Table */}
+            {/* Ko-fi Pricing Options */}
             {showPricingTable && (
               <Card className="bg-slate-800/50 border-slate-700 mb-8">
                 <CardHeader>
                   <CardTitle className="text-white text-center text-2xl">Choose Your Plan</CardTitle>
                   <CardDescription className="text-gray-300 text-center">
-                    Select the plan that best fits your needs
+                    Subscribe through Ko-fi to support the project
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PricingTable
-                    appearance={{
-                      elements: {
-                        card: "bg-slate-800 border-slate-700",
-                        cardHeader: "text-white",
-                        cardContent: "text-gray-300",
-                        button: "bg-red-600 hover:bg-red-700"
-                      }
-                    }}
-                    newSubscriptionRedirectUrl="/subscription"
-                  />
-                  <div className="mt-4 text-center text-sm text-gray-400">
-                    <p>Available Plans:</p>
-                    <p>Standard: {SUBSCRIPTION_TIERS.standard.clerkPlanId}</p>
-                    <p>Premium: {SUBSCRIPTION_TIERS.premium.clerkPlanId}</p>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <Card className="bg-slate-700/50 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-white flex items-center">
+                          <Zap className="h-6 w-6 text-blue-500 mr-2" />
+                          Standard Plan
+                        </CardTitle>
+                        <CardDescription className="text-gray-300">
+                          $3/month • 5 active missions
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                          Subscribe via Ko-fi
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-700/50 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-white flex items-center">
+                          <Crown className="h-6 w-6 text-yellow-500 mr-2" />
+                          Premium Plan
+                        </CardTitle>
+                        <CardDescription className="text-gray-300">
+                          $10/month • 10 active missions
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
+                          Subscribe via Ko-fi
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </div>
+
                   <div className="text-center mt-6">
                     <Button
                       onClick={() => setShowPricingTable(false)}
@@ -288,26 +307,26 @@ export default function SubscriptionPage() {
               </Card>
             )}
 
-            {/* Subscription Management */}
+            {/* Ko-fi Subscription Management */}
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-white">Subscription Management</CardTitle>
+                <CardTitle className="text-white">Ko-fi Subscription Management</CardTitle>
                 <CardDescription className="text-gray-300">
-                  Manage your billing and subscription settings
+                  Manage your Ko-fi subscription and billing settings
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <UserProfile
-                  appearance={{
-                    elements: {
-                      card: "bg-slate-800 border-slate-700",
-                      navbar: "bg-slate-700",
-                      navbarButton: "text-white hover:bg-slate-600",
-                      headerTitle: "text-white",
-                      headerSubtitle: "text-gray-300"
-                    }
-                  }}
-                />
+                <div className="text-center py-8">
+                  <p className="text-gray-300 mb-4">
+                    Manage your subscription directly through Ko-fi
+                  </p>
+                  <Button
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => window.open('https://ko-fi.com/manage/subscriptions', '_blank')}
+                  >
+                    Open Ko-fi Dashboard
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </>
