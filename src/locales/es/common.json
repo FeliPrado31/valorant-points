@@ -1,5 +1,15 @@
 {
-  "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "buttons": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "retry": "Reintentar"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "success": "¡Éxito!",
+    "error": "Error"
+  }
 }

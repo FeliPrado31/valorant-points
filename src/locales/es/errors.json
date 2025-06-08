@@ -1,5 +1,15 @@
 {
-  "_namespace": "errors",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidRiotId": "Formato de Riot ID inválido",
+    "invalidEmail": "Formato de email inválido"
+  },
+  "profile": {
+    "loadFailed": "Error al cargar perfil",
+    "linkFailed": "Error al vincular cuenta de Riot"
+  },
+  "network": {
+    "connectionError": "Error de conexión. Por favor intenta de nuevo.",
+    "serverError": "Error del servidor. Por favor intenta más tarde."
+  }
 }

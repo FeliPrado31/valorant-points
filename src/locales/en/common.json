@@ -1,5 +1,15 @@
 {
-  "_namespace": "common",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "buttons": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "retry": "Retry"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Success!",
+    "error": "Error"
+  }
 }

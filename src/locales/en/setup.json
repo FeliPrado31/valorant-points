@@ -1,5 +1,30 @@
 {
-  "_namespace": "setup",
-  "_status": "placeholder",
-  "_note": "This file will be populated by parallel tasks"
+  "title": "Welcome to Valorant Missions!",
+  "description": "To start tracking your missions and progress, we need to connect your Valorant account.",
+  "instructions": {
+    "enterRiotId": "Enter your Riot ID",
+    "format": "Your Riot ID consists of your game name and tag (e.g., PlayerName#1234)",
+    "note": "This information is used to fetch your Valorant statistics and is not stored permanently."
+  },
+  "fields": {
+    "username": "Username",
+    "valorantName": "Valorant Name",
+    "valorantTag": "Tag"
+  },
+  "actions": {
+    "verifyPlayer": "Verify Player",
+    "verifying": "Verifying...",
+    "completeSetup": "Complete Setup",
+    "setupInProgress": "Setting up..."
+  },
+  "messages": {
+    "verificationSuccess": "Player verified successfully!",
+    "verificationFailed": "Failed to verify player. Please check your Riot ID.",
+    "setupFailed": "Setup failed. Please try again."
+  },
+  "playerInfo": {
+    "accountLevel": "Account Level: {level}",
+    "region": "Region: {region}",
+    "lastUpdate": "Last Update: {date}"
+  }
 }
