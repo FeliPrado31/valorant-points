@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { Grid } from '@/components/ui/grid';
 import Navigation from '@/components/Navigation';
+import { KofiEmailConfirmationModal } from '@/components/KofiEmailConfirmationModal';
 import { Target, Crown, Zap } from 'lucide-react';
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
 
@@ -34,6 +35,8 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [showPricingTable, setShowPricingTable] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [showEmailConfirmModal, setShowEmailConfirmModal] = useState(false);
+  const [pendingTier, setPendingTier] = useState<'standard' | 'premium' | null>(null);
 
   useEffect(() => {
     fetchSubscriptionInfo();
@@ -85,6 +88,72 @@ export default function SubscriptionPage() {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const handleKofiSubscription = async (tier: 'standard' | 'premium') => {
+    console.log(`🔔 Handling Ko-fi subscription for tier: ${tier}`);
+
+    // For both Standard and Premium tiers, show email confirmation modal before proceeding
+    const userEmail = user?.emailAddresses?.[0]?.emailAddress || user?.primaryEmailAddress?.emailAddress;
+
+    if (!userEmail) {
+      console.error('❌ User email not available for Ko-fi integration');
+      alert('Unable to get your email address. Please try again or contact support.');
+      return;
+    }
+
+    // Show email confirmation modal for both tiers
+    setPendingTier(tier);
+    setShowEmailConfirmModal(true);
+  };
+
+  const handleEmailConfirmationConfirm = () => {
+    const userEmail = user?.emailAddresses?.[0]?.emailAddress || user?.primaryEmailAddress?.emailAddress;
+
+    if (!userEmail || !pendingTier) {
+      console.error('❌ Missing email or tier information');
+      return;
+    }
+
+    console.log('✅ User confirmed email requirements for Ko-fi subscription');
+
+    // Construct Ko-fi URL with user email and parameters
+    const kofiUrl = new URL('https://ko-fi.com/valorantmissions/tiers');
+    kofiUrl.searchParams.set('email', userEmail);
+    kofiUrl.searchParams.set('source', 'valorant-points');
+    kofiUrl.searchParams.set('tier', pendingTier);
+
+    console.log('🔗 Opening Ko-fi tiers page directly:', {
+      url: kofiUrl.toString(),
+      email: userEmail,
+      tier: pendingTier,
+      userConfirmed: true
+    });
+
+    // Open Ko-fi tiers page in new tab
+    window.open(kofiUrl.toString(), '_blank');
+
+    // Close modal and reset state
+    setShowEmailConfirmModal(false);
+    setPendingTier(null);
+  };
+
+  const handleEmailConfirmationCancel = () => {
+    console.log('🚫 User cancelled Ko-fi upgrade - email confirmation required');
+    setShowEmailConfirmModal(false);
+    setPendingTier(null);
+  };
+
+  const handleContactSupport = () => {
+    console.log('📞 User requested support contact');
+
+    // Open support contact options
+    window.open(
+      'mailto:support@valorantpoints.com?subject=Ko-fi Email Address Question&body=I need help with email address requirements for Ko-fi subscription.',
+      '_blank'
+    );
+
+    // Keep modal open in case user wants to continue after contacting support
   };
 
   const getTierIcon = (tier: string) => {
@@ -210,15 +279,41 @@ export default function SubscriptionPage() {
                   {subscriptionInfo.tier === 'free' ? 'Upgrade Your Plan' : 'Upgrade to Premium'}
                 </h2>
                 <p className="text-gray-300 mb-6 text-sm sm:text-base">
-                  Get more missions and unlock advanced features
+                  {subscriptionInfo.tier === 'free'
+                    ? 'Get more missions and unlock advanced features'
+                    : 'Unlock unlimited missions with Premium'
+                  }
                 </p>
                 <Button
-                  onClick={() => setShowPricingTable(true)}
+                  onClick={() => {
+                    if (subscriptionInfo.tier === 'standard') {
+                      // For Standard users, go directly to Ko-fi Premium upgrade
+                      handleKofiSubscription('premium');
+                    } else {
+                      // For Free users, show pricing table
+                      setShowPricingTable(true);
+                    }
+                  }}
                   size="lg"
-                  className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+                  className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  View Pricing Plans
+                  {subscriptionInfo.tier === 'free' ? 'View Pricing Plans' : 'Upgrade to Premium'}
                 </Button>
+              </div>
+            )}
+
+            {/* Premium User Message */}
+            {subscriptionInfo.tier === 'premium' && (
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="bg-gradient-to-r from-yellow-600/20 to-yellow-500/20 border border-yellow-500/30 rounded-lg p-6">
+                  <Crown className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                    Premium Member
+                  </h2>
+                  <p className="text-gray-300 text-sm sm:text-base">
+                    You're enjoying all premium features with unlimited missions!
+                  </p>
+                </div>
               </div>
             )}
 
@@ -232,47 +327,72 @@ export default function SubscriptionPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <Card className="bg-slate-700/50 border-slate-600">
-                      <CardHeader>
-                        <CardTitle className="text-white flex items-center">
-                          <Zap className="h-6 w-6 text-blue-500 mr-2" />
-                          Standard Plan
-                        </CardTitle>
-                        <CardDescription className="text-gray-300">
-                          $3/month • 5 active missions
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                          Subscribe via Ko-fi
-                        </Button>
-                      </CardContent>
-                    </Card>
+                  {subscriptionInfo.tier === 'premium' ? (
+                    // Premium user - show message
+                    <div className="text-center py-8">
+                      <Crown className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-white mb-2">You have the highest tier!</h3>
+                      <p className="text-gray-300">
+                        You're already enjoying all premium features with unlimited missions.
+                      </p>
+                    </div>
+                  ) : (
+                    // Free or Standard user - show available upgrades
+                    <div className={`grid ${subscriptionInfo.tier === 'free' ? 'md:grid-cols-2' : 'md:grid-cols-1'} gap-6`}>
+                      {/* Standard Plan - only show if user is on free tier */}
+                      {subscriptionInfo.tier === 'free' && (
+                        <Card className="bg-slate-700/50 border-slate-600">
+                          <CardHeader>
+                            <CardTitle className="text-white flex items-center">
+                              <Zap className="h-6 w-6 text-blue-500 mr-2" />
+                              Standard Plan
+                            </CardTitle>
+                            <CardDescription className="text-gray-300">
+                              $3/month • 5 active missions
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <Button
+                              className="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+                              onClick={() => handleKofiSubscription('standard')}
+                            >
+                              Subscribe via Ko-fi
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      )}
 
-                    <Card className="bg-slate-700/50 border-slate-600">
-                      <CardHeader>
-                        <CardTitle className="text-white flex items-center">
-                          <Crown className="h-6 w-6 text-yellow-500 mr-2" />
-                          Premium Plan
-                        </CardTitle>
-                        <CardDescription className="text-gray-300">
-                          $10/month • 10 active missions
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
-                          Subscribe via Ko-fi
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      {/* Premium Plan - show for free and standard users */}
+                      <Card className="bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white flex items-center">
+                            <Crown className="h-6 w-6 text-yellow-500 mr-2" />
+                            Premium Plan
+                            {subscriptionInfo.tier === 'standard' && (
+                              <Badge className="ml-2 bg-yellow-600 text-yellow-100">Upgrade</Badge>
+                            )}
+                          </CardTitle>
+                          <CardDescription className="text-gray-300">
+                            $10/month • 10 active missions
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            className="w-full bg-yellow-600 hover:bg-yellow-700 transition-colors duration-200"
+                            onClick={() => handleKofiSubscription('premium')}
+                          >
+                            {subscriptionInfo.tier === 'standard' ? 'Upgrade to Premium' : 'Subscribe via Ko-fi'}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
 
                   <div className="text-center mt-6">
                     <Button
                       onClick={() => setShowPricingTable(false)}
                       variant="outline"
-                      className="text-white border-slate-600 hover:bg-slate-800"
+                      className="text-white border-slate-500 bg-slate-800/50 hover:bg-slate-700 hover:border-slate-400 transition-all duration-200 px-6 py-2 font-medium"
                     >
                       Hide Pricing
                     </Button>
@@ -322,7 +442,7 @@ export default function SubscriptionPage() {
                   </p>
                   <Button
                     className="bg-red-600 hover:bg-red-700"
-                    onClick={() => window.open('https://ko-fi.com/manage/subscriptions', '_blank')}
+                    onClick={() => window.open('https://ko-fi.com/manage/supportreceived', '_blank')}
                   >
                     Open Ko-fi Dashboard
                   </Button>
@@ -331,6 +451,16 @@ export default function SubscriptionPage() {
             </Card>
           </>
         )}
+
+        {/* Ko-fi Email Confirmation Modal */}
+        <KofiEmailConfirmationModal
+          isOpen={showEmailConfirmModal}
+          onClose={handleEmailConfirmationCancel}
+          onConfirm={handleEmailConfirmationConfirm}
+          onContactSupport={handleContactSupport}
+          userEmail={user?.emailAddresses?.[0]?.emailAddress || user?.primaryEmailAddress?.emailAddress || ''}
+          tier={pendingTier || 'standard'}
+        />
       </Container>
     </div>
   );

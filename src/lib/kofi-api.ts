@@ -82,6 +82,13 @@ export class KofiApiClient {
     if (!this.webhookSecret) {
       console.warn('⚠️ KOFI_WEBHOOK_SECRET environment variable is not set. Webhook verification will fail.');
     }
+
+    console.log('🔧 Ko-fi API Client initialized:', {
+      hasApiKey: !!this.apiKey,
+      hasWebhookSecret: !!this.webhookSecret,
+      baseUrl: this.baseUrl,
+      kofiPageUrl: process.env.KOFI_PAGE_URL || 'https://ko-fi.com/valorantmissions'
+    });
   }
 
   /**
@@ -111,12 +118,37 @@ export class KofiApiClient {
     };
 
     try {
+      console.log('🌐 Making Ko-fi API request:', { url, method: options.method || 'GET' });
+
       const response = await fetch(url, {
         ...options,
         headers,
       });
 
-      const data = await response.json();
+      console.log('📡 Ko-fi API response:', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type')
+      });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      const isJson = contentType && contentType.includes('application/json');
+
+      let data;
+      if (isJson) {
+        data = await response.json();
+      } else {
+        // Response is not JSON (likely HTML error page)
+        const textResponse = await response.text();
+        console.warn('⚠️ Ko-fi API returned non-JSON response:', textResponse.substring(0, 200));
+
+        return {
+          success: false,
+          error: `Ko-fi API is not available. The service may be down or the endpoint doesn't exist. (HTTP ${response.status})`,
+          message: 'Please try visiting Ko-fi directly'
+        };
+      }
 
       if (!response.ok) {
         console.error('Ko-fi API Error:', {
@@ -124,7 +156,7 @@ export class KofiApiClient {
           statusText: response.statusText,
           data
         });
-        
+
         return {
           success: false,
           error: data.error || `HTTP ${response.status}: ${response.statusText}`,
@@ -147,36 +179,25 @@ export class KofiApiClient {
 
   /**
    * Create a new Ko-fi subscription
+   * Note: This is a mock implementation since Ko-fi doesn't have a public API for subscription creation
+   * In production, users would subscribe directly on Ko-fi and webhooks would update our system
    */
   async createSubscription(request: CreateSubscriptionRequest): Promise<KofiApiResponse<KofiSubscription>> {
-    const endpoint = '/subscriptions';
-    
-    // Map tier to Ko-fi pricing
-    const tierPricing = {
-      standard: { amount: 3, currency: 'USD' },
-      premium: { amount: 10, currency: 'USD' }
-    };
-
-    const pricing = tierPricing[request.tier];
-    
-    const payload = {
-      user_id: request.user_id,
-      email: request.email,
-      amount: pricing.amount,
-      currency: pricing.currency,
+    console.log('🔔 Ko-fi subscription creation requested:', {
       tier: request.tier,
-      return_url: request.return_url || `${process.env.NEXT_PUBLIC_APP_URL}/subscription?success=true`,
-      cancel_url: request.cancel_url || `${process.env.NEXT_PUBLIC_APP_URL}/subscription?cancelled=true`,
-      metadata: {
-        app: 'valorant-points',
-        tier: request.tier
-      }
-    };
-
-    return this.makeRequest<KofiSubscription>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(payload)
+      user_id: request.user_id,
+      email: request.email
     });
+
+    // Since Ko-fi doesn't have a public subscription API, we'll return a mock response
+    // and direct users to the Ko-fi page for actual subscription
+    console.warn('⚠️ Ko-fi API is not available for subscription creation. Redirecting to Ko-fi page.');
+
+    return {
+      success: false,
+      error: 'Ko-fi subscription API is not available',
+      message: 'Please visit our Ko-fi page to subscribe directly'
+    };
   }
 
   /**
@@ -275,29 +296,33 @@ export class KofiApiClient {
 
   /**
    * Get checkout URL for a subscription tier
+   * Redirects to the actual Ko-fi page with membership tiers
    */
   getCheckoutUrl(tier: 'standard' | 'premium', userId: string, email: string): string {
-    const tierPricing = {
-      standard: { amount: 3, name: 'Standard Plan' },
-      premium: { amount: 10, name: 'Premium Plan' }
-    };
+    const kofiPageUrl = process.env.KOFI_PAGE_URL || 'https://ko-fi.com/valorantmissions';
 
-    const pricing = tierPricing[tier];
-    const baseUrl = 'https://ko-fi.com/s';
-    
-    // Ko-fi checkout URL format (this may need adjustment based on actual Ko-fi API)
-    const params = new URLSearchParams({
-      amount: pricing.amount.toString(),
-      currency: 'USD',
-      title: pricing.name,
-      user_id: userId,
-      email: email,
-      tier: tier,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?cancelled=true`
+    // For Ko-fi memberships, we redirect to the main Ko-fi page
+    // Users will select their membership tier on the Ko-fi page
+    // Ko-fi will handle the subscription creation and send webhooks back to our app
+
+    console.log('🔗 Generating Ko-fi checkout URL:', {
+      tier,
+      userId,
+      email,
+      kofiPageUrl
     });
 
-    return `${baseUrl}?${params.toString()}`;
+    // Add query parameters to help Ko-fi identify the user and tier preference
+    const params = new URLSearchParams({
+      // These parameters may be used by Ko-fi for tracking
+      source: 'valorant-points',
+      tier: tier,
+      user_id: userId,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/subscription?success=true`
+    });
+
+    // Return the Ko-fi page URL with optional parameters
+    return `${kofiPageUrl}?${params.toString()}`;
   }
 }
 
@@ -332,14 +357,17 @@ export function mapKofiStatusToInternal(kofiStatus: string): 'active' | 'inactiv
 
 /**
  * Utility function to map Ko-fi tier to our internal tier
+ * Handles both English and Spanish tier names from Ko-fi
  */
 export function mapKofiTierToInternal(kofiTier: string): 'free' | 'standard' | 'premium' {
   switch (kofiTier.toLowerCase()) {
     case 'standard':
+    case 'estandar': // Spanish version from Ko-fi page
       return 'standard';
     case 'premium':
       return 'premium';
     default:
+      console.warn('⚠️ Unknown Ko-fi tier:', kofiTier, '- defaulting to free');
       return 'free';
   }
 }

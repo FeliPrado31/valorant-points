@@ -13,10 +13,10 @@ export interface SubscriptionTier {
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Free',
-    maxActiveMissions: 3,
+    maxActiveMissions: 1,
     price: 0,
     kofiTierId: null,
-    features: ['Up to 3 active missions', 'Basic mission tracking', 'Daily mission refresh']
+    features: ['Up to 1 active mission', 'Basic mission tracking', 'Daily mission refresh']
   },
   standard: {
     name: 'Standard',
@@ -35,8 +35,10 @@ export const SUBSCRIPTION_TIERS = {
 } as const;
 
 // Ko-fi tier ID to tier mapping for reverse lookup
+// Supports both English and Spanish tier names from Ko-fi
 export const KOFI_TIER_ID_TO_TIER = {
   'standard': 'standard',
+  'estandar': 'standard', // Spanish version from Ko-fi page
   'premium': 'premium'
 } as const;
 
