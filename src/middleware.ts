@@ -1,43 +1,38 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import createMiddleware from 'next-intl/middleware';
-import { NextRequest } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
 
-// Create the next-intl middleware
-const intlMiddleware = createMiddleware({
+const handleI18nRouting = createMiddleware({
   locales,
   defaultLocale,
   localePrefix: 'always'
 });
 
 const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/missions(.*)',
-  '/leaderboard(.*)',
-  '/subscription(.*)',
-  '/profile(.*)',
+  '/(es|en)/dashboard(.*)',
+  '/(es|en)/missions(.*)',
+  '/(es|en)/leaderboard(.*)',
+  '/(es|en)/subscription(.*)',
+  '/(es|en)/profile(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  // Handle locale routing first
-  const response = intlMiddleware(req);
-
-  // Check if this is a protected route (accounting for locale prefix)
-  const pathname = req.nextUrl.pathname;
-  const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
-
-  if (isProtectedRoute(req) || (pathnameWithoutLocale && isProtectedRoute({ ...req, nextUrl: { ...req.nextUrl, pathname: pathnameWithoutLocale } } as NextRequest))) {
-    await auth.protect()
+  // For protected routes, require authentication
+  if (isProtectedRoute(req)) {
+    await auth.protect();
   }
 
-  return response;
+  // For non-API routes, handle i18n routing
+  if (!req.nextUrl.pathname.startsWith('/api/')) {
+    return handleI18nRouting(req);
+  }
 })
 
 export const config = {
-  // Match all pathnames except for
-  // - API routes
-  // - _next (Next.js internals)
-  // - _vercel (Vercel internals)
-  // - Static files (images, etc.)
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

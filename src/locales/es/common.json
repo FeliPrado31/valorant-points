@@ -45,9 +45,7 @@
     "subtotal": "Subtotal",
     "tax": "Impuesto",
     "discount": "Descuento",
-    "features": "Características",
-    "all": "Todos",
-    "note": "Nota"
+    "features": "Características"
   },
   "status": {
     "active": "Activo",
@@ -99,5 +97,43 @@
     "unauthorized": "Acceso no autorizado",
     "forbidden": "Acceso prohibido",
     "serverError": "Error del servidor"
+  },
+  "home": {
+    "hero": {
+      "title": "Mejora Tu Juego de {valorant}",
+      "subtitle": "Completa misiones desafiantes basadas en tu gameplay real de Valorant. Rastrea tu progreso, gana recompensas y compite con otros jugadores.",
+      "cta": "Comienza Tu Aventura"
+    },
+    "features": {
+      "realTime": {
+        "title": "Misiones en Tiempo Real",
+        "description": "Completa misiones como \"Consigue 10 headshots\" o \"Gana 5 partidas de Spike Rush\" basadas en tus datos reales de partidas de Valorant."
+      },
+      "rewards": {
+        "title": "Gana Recompensas",
+        "description": "Obtén puntos y desbloquea logros mientras completas misiones. Rastrea tu progreso y celebra tus victorias."
+      },
+      "compete": {
+        "title": "Compite y Compara",
+        "description": "Ve cómo te comparas con otros jugadores en la tabla de clasificación. Desafía a amigos y escala en los rankings."
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "steps": {
+        "connect": {
+          "title": "Conecta Tu Cuenta",
+          "description": "Vincula tu cuenta de Valorant proporcionando tu Riot ID y tag."
+        },
+        "choose": {
+          "title": "Elige Misiones",
+          "description": "Selecciona entre varias misiones adaptadas a tu nivel de habilidad y estilo de juego."
+        },
+        "play": {
+          "title": "Juega y Progresa",
+          "description": "Juega Valorant normalmente y observa cómo se actualiza automáticamente el progreso de tus misiones."
+        }
+      }
+    }
   }
 }

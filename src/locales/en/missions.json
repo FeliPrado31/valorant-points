@@ -1,40 +1,36 @@
+
 {
+  "types": {
+    "kills": "kills",
+    "headshots": "headshots",
+    "gamemode": "gamemode",
+    "weapon": "weapon",
+    "rounds": "rounds",
+    "wins": "wins"
+  },
   "difficulty": {
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard"
-  },
-  "types": {
-    "kills": "Kills",
-    "headshots": "Headshots",
-    "gamemode": "Game Mode",
-    "weapon": "Weapon",
-    "rounds": "Rounds",
-    "wins": "Wins"
-  },
-  "status": {
-    "available": "Available",
-    "active": "Active",
-    "completed": "Completed",
-    "expired": "Expired"
   },
   "filters": {
     "searchPlaceholder": "Search missions...",
     "filterBy": "Filter by",
     "difficulty": "Difficulty",
     "type": "Type",
-    "status": "Status",
     "clearFilters": "Clear Filters",
-    "showingResults": "Showing {{count}} of {{total}} missions",
-    "noResults": "No missions found matching your filters",
-    "upgradeForFilters": {
-      "free": "Upgrade to Standard or Premium to access mission filters and search.",
-      "standard": "Upgrade to Premium to access advanced mission filters and search."
-    }
+    "showingResults": "Showing {count} of {total} missions",
+    "noResults": "No missions found matching your criteria"
   },
   "actions": {
     "acceptMission": "Accept Mission",
     "viewProgress": "View Progress",
     "completeMission": "Complete Mission"
+  },
+  "status": {
+    "available": "Available",
+    "active": "Active",
+    "completed": "Completed",
+    "expired": "Expired"
   }
 }

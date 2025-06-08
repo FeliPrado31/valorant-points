@@ -1,7 +1,7 @@
 ﻿import { getRequestConfig } from 'next-intl/server';
 
 export default getRequestConfig(async ({ locale }) => {
-  const actualLocale = locale || 'en';
+  const actualLocale = locale || 'es';
 
   return {
     locale: actualLocale,

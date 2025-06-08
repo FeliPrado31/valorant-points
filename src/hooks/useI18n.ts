@@ -68,35 +68,35 @@ function useDynamicTranslations(namespace: string) {
   };
 }
 
-// Placeholder hooks for parallel development
+// Translation hooks for each namespace
 export function useCommonTranslations() {
-  return useTranslations();
+  return useTranslations('common');
 }
 
 export function useNavigationTranslations() {
-  return useTranslations();
+  return useTranslations('navigation');
 }
 
 export function useDashboardTranslations() {
-  return useTranslations();
+  return useTranslations('dashboard');
 }
 
 export function useProfileTranslations() {
-  return useDynamicTranslations('profile');
+  return useTranslations('profile');
 }
 
 export function useSetupTranslations() {
-  return useDynamicTranslations('setup');
+  return useTranslations('setup');
 }
 
 export function useSubscriptionTranslations() {
-  return useTranslations();
+  return useTranslations('subscription');
 }
 
 export function useMissionsTranslations() {
-  return useTranslations();
+  return useTranslations('missions');
 }
 
 export function useErrorsTranslations() {
-  return useDynamicTranslations('errors');
+  return useTranslations('errors');
 }
