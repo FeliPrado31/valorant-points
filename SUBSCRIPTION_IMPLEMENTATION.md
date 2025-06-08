@@ -19,14 +19,14 @@ Successfully implemented Clerk subscription plans for mission access control in 
 
 ### 3. **User Interface Components**
 - **SubscriptionStatus Component**: Shows current tier, usage, and limits
-- **PricingModal Component**: Displays upgrade options with Clerk PricingTable
-- **Subscription Page**: Dedicated subscription management page
+- **PricingModal Component**: Displays upgrade options with Ko-fi checkout integration
+- **Subscription Page**: Dedicated subscription management page with Ko-fi billing
 - **Dashboard Integration**: Seamless subscription info display
 
 ### 4. **API Endpoints**
-- `/api/subscriptions` - GET/POST for subscription management
-- `/api/users/initialize-subscription` - Initialize subscription data for existing users
-- `/api/webhooks/clerk` - Handle subscription updates from Clerk
+- `/api/subscriptions` - GET/POST for subscription management (Ko-fi integration)
+- `/api/kofi/subscriptions` - Ko-fi specific subscription management
+- `/api/kofi/webhooks` - Handle subscription updates from Ko-fi
 - Enhanced `/api/user-missions` - Mission acceptance with limit checks
 
 ### 5. **Webhook Integration**

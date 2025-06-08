@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
       // Initialize with free tier subscription
       subscription: {
         tier: 'free',
-        status: 'active'
+        status: 'active',
+        provider: 'kofi'
       },
       // Initialize mission limits
       missionLimits: {
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     // Save user to Firestore
     await adminDb.collection('users').doc(userId).set(userData);
 
-    console.log('✅ Created new user with subscription data:', userId, {
+    console.log('✅ Created new user with Ko-fi subscription data:', userId, {
       tier: 'free',
       maxMissions,
       availableSlots: maxMissions

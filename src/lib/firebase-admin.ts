@@ -55,8 +55,9 @@ export interface User {
   subscription?: {
     tier: 'free' | 'standard' | 'premium';
     status: 'active' | 'inactive' | 'cancelled';
-    clerkSubscriptionId?: string;
-    planId?: string;
+    provider: 'kofi';
+    kofiSubscriptionId?: string;
+    kofiTierId?: string;
     currentPeriodStart?: Date;
     currentPeriodEnd?: Date;
   };
@@ -124,14 +125,14 @@ export interface ValorantMatch {
 // Re-export subscription types and utilities from client-safe module
 export {
   SUBSCRIPTION_TIERS,
-  CLERK_PLAN_ID_TO_TIER,
+  KOFI_TIER_ID_TO_TIER,
   getSubscriptionTier,
   getMaxActiveMissions,
   shouldRefreshMissionSlots,
   shouldRefreshDailyMissions,
   generateDailyMissionSelection,
-  getTierFromClerkPlanId,
-  getClerkPlanIdFromTier,
+  getTierFromKofiTierId,
+  getKofiTierIdFromTier,
   type SubscriptionTierKey
 } from './subscription-types';
 

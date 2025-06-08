@@ -105,7 +105,8 @@ export async function POST(request: NextRequest) {
         ...userData,
         subscription: {
           tier: 'free',
-          status: 'active'
+          status: 'active',
+          provider: 'kofi'
         },
         missionLimits: {
           maxActiveMissions: maxMissions,

@@ -1,39 +1,85 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection - users can only read/write their own data
+
+    // Helper functions for Ko-fi subscription validation
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidSubscriptionTier(tier) {
+      return tier in ['free', 'standard', 'premium'];
+    }
+
+    function isValidSubscriptionStatus(status) {
+      return status in ['active', 'inactive', 'cancelled'];
+    }
+
+    function isValidProvider(provider) {
+      return provider in ['kofi'];
+    }
+
+    // Users collection - Ko-fi subscription data validation
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isOwner(userId);
+
+      // Allow write with subscription validation
+      allow write: if isOwner(userId) &&
+        // Validate subscription data if present
+        (!('subscription' in request.resource.data) ||
+         (request.resource.data.subscription.tier is string &&
+          isValidSubscriptionTier(request.resource.data.subscription.tier) &&
+          request.resource.data.subscription.status is string &&
+          isValidSubscriptionStatus(request.resource.data.subscription.status) &&
+          request.resource.data.subscription.provider is string &&
+          isValidProvider(request.resource.data.subscription.provider)));
     }
     
     // Missions collection - read-only for authenticated users
     match /missions/{missionId} {
-      allow read: if request.auth != null;
-      allow write: if false; // Only admin can create/update missions
+      allow read: if isAuthenticated();
+      allow write: if false; // Only server can create/update missions
     }
-    
+
     // User missions collection - users can only access their own missions
     match /userMissions/{userMissionId} {
-      allow read, write: if request.auth != null && 
+      allow read: if isAuthenticated() &&
         resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && 
+      allow create: if isAuthenticated() &&
         request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+      allow delete: if false; // No deletion allowed
     }
-    
-    // Valorant matches collection - users can only access their own matches
+
+    // Valorant matches collection - users can only read their matches
     match /valorantMatches/{matchId} {
-      allow read, write: if request.auth != null && 
-        resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && 
-        request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() &&
+        request.auth.uid in resource.data.playerIds;
+      allow write: if false; // Only server can write match data
     }
-    
+
     // Leaderboards collection - read-only for authenticated users
     match /leaderboards/{leaderboardId} {
-      allow read: if request.auth != null;
+      allow read: if isAuthenticated();
       allow write: if false; // Only server can update leaderboards
     }
-    
+
+    // Ko-fi webhook logs (server-only)
+    match /webhook_logs/{logId} {
+      allow read, write: if false; // Only server access via Admin SDK
+    }
+
+    // Subscription audit logs (server-only)
+    match /subscription_logs/{logId} {
+      allow read, write: if false; // Only server access via Admin SDK
+    }
+
     // Default deny all other access
     match /{document=**} {
       allow read, write: if false;

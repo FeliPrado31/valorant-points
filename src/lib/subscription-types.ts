@@ -9,35 +9,37 @@ export interface SubscriptionTier {
   features: string[];
 }
 
-// Subscription tier configuration with Clerk plan IDs
+// Subscription tier configuration with Ko-fi integration
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Free',
-    maxActiveMissions: 3,
+    maxActiveMissions: 1,
     price: 0,
-    clerkPlanId: null,
-    features: ['Up to 3 active missions', 'Basic mission tracking', 'Daily mission refresh']
+    kofiTierId: null,
+    features: ['Up to 1 active mission', 'Basic mission tracking', 'Daily mission refresh']
   },
   standard: {
     name: 'Standard',
     maxActiveMissions: 5,
     price: 3,
-    clerkPlanId: 'cplan_2xb4nXJsuap2kli8KvX3bIgIPAA',
+    kofiTierId: 'standard',
     features: ['Up to 5 active missions', 'Advanced mission tracking', 'Daily mission refresh', 'Priority support']
   },
   premium: {
     name: 'Premium',
     maxActiveMissions: 10,
     price: 10,
-    clerkPlanId: 'cplan_2xb4qlrucukzKqSlMKtE7pvJdq9',
+    kofiTierId: 'premium',
     features: ['Up to 10 active missions', 'Advanced mission tracking', 'Daily mission refresh', 'Priority support', 'Exclusive missions']
   }
 } as const;
 
-// Plan ID to tier mapping for reverse lookup
-export const CLERK_PLAN_ID_TO_TIER = {
-  'cplan_2xb4nXJsuap2kli8KvX3bIgIPAA': 'standard',
-  'cplan_2xb4qlrucukzKqSlMKtE7pvJdq9': 'premium'
+// Ko-fi tier ID to tier mapping for reverse lookup
+// Supports both English and Spanish tier names from Ko-fi
+export const KOFI_TIER_ID_TO_TIER = {
+  'standard': 'standard',
+  'estandar': 'standard', // Spanish version from Ko-fi page
+  'premium': 'premium'
 } as const;
 
 export type SubscriptionTierKey = keyof typeof SUBSCRIPTION_TIERS;
@@ -82,15 +84,7 @@ export const shouldRefreshMissionSlots = (user: Record<string, unknown>): boolea
   return hoursSinceRefresh >= 24;
 };
 
-// Get tier from Clerk plan ID
-export const getTierFromClerkPlanId = (planId: string): SubscriptionTierKey => {
-  return CLERK_PLAN_ID_TO_TIER[planId as keyof typeof CLERK_PLAN_ID_TO_TIER] || 'free';
-};
 
-// Get Clerk plan ID from tier
-export const getClerkPlanIdFromTier = (tier: SubscriptionTierKey): string | null => {
-  return SUBSCRIPTION_TIERS[tier].clerkPlanId;
-};
 
 // Check if daily missions need refresh
 export const shouldRefreshDailyMissions = (user: Record<string, unknown>): boolean => {
@@ -169,4 +163,34 @@ export const generateDailyMissionSelection = (
   }
 
   return missions.slice(0, maxMissions).map(m => m.id);
+};
+
+// Ko-fi utility functions
+export const getTierFromKofiTierId = (kofiTierId: string): SubscriptionTierKey => {
+  return KOFI_TIER_ID_TO_TIER[kofiTierId as keyof typeof KOFI_TIER_ID_TO_TIER] || 'free';
+};
+
+export const getKofiTierIdFromTier = (tier: SubscriptionTierKey): string | null => {
+  return SUBSCRIPTION_TIERS[tier].kofiTierId;
+};
+
+// Billing provider types
+export type BillingProvider = 'kofi';
+
+// Enhanced subscription interface for Ko-fi
+export interface EnhancedSubscription {
+  tier: SubscriptionTierKey;
+  status: 'active' | 'inactive' | 'cancelled';
+  provider: BillingProvider;
+  // Ko-fi-specific fields
+  kofiSubscriptionId?: string;
+  kofiTierId?: string;
+  // Common fields
+  currentPeriodStart?: Date;
+  currentPeriodEnd?: Date;
+}
+
+// Utility to get billing provider (always Ko-fi now)
+export const getBillingProvider = (): BillingProvider => {
+  return 'kofi';
 };

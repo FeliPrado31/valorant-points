@@ -39,6 +39,5 @@ export default function AutoRedirect() {
     }
   }, [isLoaded, user, checking, checkUserSetup]);
 
-  // Don't render anything, this component just handles redirection
   return null;
 }

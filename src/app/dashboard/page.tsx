@@ -545,6 +545,8 @@ function DashboardContent() {
         isOpen={showPricingModal}
         onClose={() => setShowPricingModal(false)}
         currentTier={(userProfile?.subscription?.tier as 'free' | 'standard' | 'premium') || 'free'}
+        userEmail={user?.emailAddresses?.[0]?.emailAddress}
+        userId={user?.id}
       />
     </div>
   );

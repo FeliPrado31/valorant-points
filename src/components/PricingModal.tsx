@@ -5,14 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Check, Crown, Zap, X } from 'lucide-react';
-import { PricingTable } from '@clerk/nextjs';
+import { Check, Crown, Zap, X, ExternalLink } from 'lucide-react';
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
+import { getKofiApiClient } from '@/lib/kofi-api';
 
 interface PricingModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentTier?: 'free' | 'standard' | 'premium';
+  userEmail?: string;
+  userId?: string;
 }
 
 // Enhanced pricing plans with UI properties
@@ -43,56 +45,35 @@ const PRICING_PLANS = {
   }
 };
 
-export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: PricingModalProps) {
-  const [showClerkPricing, setShowClerkPricing] = useState(false);
+export default function PricingModal({ isOpen, onClose, currentTier = 'free', userEmail, userId }: PricingModalProps) {
+  const [loading, setLoading] = useState(false);
 
-  const handlePlanSelect = (planKey: string) => {
-    if (planKey === 'free') {
-      // Handle downgrade to free (if needed)
+  const handleKofiSubscribe = async (tier: 'standard' | 'premium') => {
+    if (!userEmail || !userId) {
+      alert('Please sign in to subscribe');
       return;
     }
 
-    // For paid plans, show Clerk pricing table
-    setShowClerkPricing(true);
+    setLoading(true);
+    try {
+      // Create Ko-fi checkout URL
+      const kofiClient = getKofiApiClient();
+      const checkoutUrl = kofiClient.getCheckoutUrl(tier, userId, userEmail);
+
+      // Open Ko-fi checkout in new window
+      window.open(checkoutUrl, '_blank', 'width=600,height=700');
+
+      // Close modal
+      onClose();
+    } catch (error) {
+      console.error('Error creating Ko-fi checkout:', error);
+      alert('Failed to open Ko-fi checkout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (showClerkPricing) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white text-2xl">Complete Your Subscription</DialogTitle>
-            <DialogDescription className="text-gray-300">
-              Choose your payment method and complete the subscription process
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-6">
-            <PricingTable
-              appearance={{
-                elements: {
-                  card: "bg-slate-800 border-slate-700",
-                  cardHeader: "text-white",
-                  cardContent: "text-gray-300",
-                  button: "bg-red-600 hover:bg-red-700"
-                }
-              }}
-              newSubscriptionRedirectUrl="/subscription"
-            />
 
-          </div>
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={() => setShowClerkPricing(false)}
-              variant="outline"
-              className="text-white border-slate-600 hover:bg-slate-800"
-            >
-              Back to Plans
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -143,12 +124,28 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
                 </ul>
 
                 <Button
-                  onClick={() => handlePlanSelect(key)}
-                  disabled={currentTier === key}
+                  onClick={() => {
+                    if (key === 'free') {
+                      // Handle downgrade to free (if needed)
+                      return;
+                    }
+                    handleKofiSubscribe(key as 'standard' | 'premium');
+                  }}
+                  disabled={currentTier === key || loading}
                   className={`w-full ${plan.buttonColor} text-white`}
                 >
-                  {currentTier === key ? 'Current Plan' :
-                   key === 'free' ? 'Downgrade' : 'Upgrade'}
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Loading...
+                    </>
+                  ) : currentTier === key ? 'Current Plan' :
+                   key === 'free' ? 'Downgrade' : (
+                    <>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Subscribe via Ko-fi
+                    </>
+                  )}
                 </Button>
 
                 {currentTier === key && (
@@ -165,6 +162,7 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
 
         <div className="mt-8 text-center text-gray-400 text-sm">
           <p>All plans include mission tracking and progress monitoring.</p>
+          <p>Subscriptions are processed securely through Ko-fi.</p>
           <p>Cancel anytime. No hidden fees.</p>
         </div>
       </DialogContent>
