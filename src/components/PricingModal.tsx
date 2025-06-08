@@ -1,18 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useLocale } from 'next-intl';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Check, Crown, Zap, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Grid } from '@/components/ui/grid';
 import { PricingTable } from '@clerk/nextjs';
+import { Crown, Zap, X, CheckCircle } from 'lucide-react';
 import { SUBSCRIPTION_TIERS } from '@/lib/subscription-types';
+import {
+  useSubscriptionTranslations
+} from '@/hooks/useI18n';
 
 interface PricingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentTier?: 'free' | 'standard' | 'premium';
+  currentTier?: string;
 }
 
 // Enhanced pricing plans with UI properties
@@ -45,14 +50,13 @@ const PRICING_PLANS = {
 
 export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: PricingModalProps) {
   const [showClerkPricing, setShowClerkPricing] = useState(false);
+  const locale = useLocale();
+  const t = useSubscriptionTranslations();
 
   const handlePlanSelect = (planKey: string) => {
     if (planKey === 'free') {
-      // Handle downgrade to free (if needed)
       return;
     }
-
-    // For paid plans, show Clerk pricing table
     setShowClerkPricing(true);
   };
 
@@ -61,9 +65,11 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
           <DialogHeader>
-            <DialogTitle className="text-white text-2xl">Complete Your Subscription</DialogTitle>
+            <DialogTitle className="text-white text-2xl">
+              {t('billing.completeSubscription')}
+            </DialogTitle>
             <DialogDescription className="text-gray-300">
-              Choose your payment method and complete the subscription process
+              {t('billing.choosePaymentMethod')}
             </DialogDescription>
           </DialogHeader>
           <div className="mt-6">
@@ -76,18 +82,8 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
                   button: "bg-red-600 hover:bg-red-700"
                 }
               }}
-              newSubscriptionRedirectUrl="/subscription"
+              newSubscriptionRedirectUrl={`/${locale}/subscription`}
             />
-
-          </div>
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={() => setShowClerkPricing(false)}
-              variant="outline"
-              className="text-white border-slate-600 hover:bg-slate-800"
-            >
-              Back to Plans
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -98,22 +94,26 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
         <DialogHeader>
-          <DialogTitle className="text-white text-3xl text-center">Choose Your Plan</DialogTitle>
-          <DialogDescription className="text-gray-300 text-center text-lg">
-            Unlock more missions and features with our subscription plans
+          <DialogTitle className="text-white text-2xl text-center">
+            {t('actions.upgrade')}
+          </DialogTitle>
+          <DialogDescription className="text-gray-300 text-center">
+            {t('billing.choosePlan')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-8">
-          {Object.entries(PRICING_PLANS).map(([key, plan]) => (
+        <Grid cols={{ default: 1, md: 3 }} gap="lg" className="mt-6">
+          {Object.entries(PRICING_PLANS).map(([planKey, plan]) => (
             <Card
-              key={key}
-              className={`relative bg-slate-800/50 ${plan.color} ${plan.popular ? 'ring-2 ring-blue-500' : ''} transition-all hover:scale-105`}
+              key={planKey}
+              className={`bg-slate-800/50 border-slate-700 relative ${
+                plan.popular ? 'ring-2 ring-blue-500' : ''
+              }`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-blue-600 text-white px-3 py-1">
-                    Most Popular
+                  <Badge className="bg-blue-600 text-white">
+                    {t('billing.popular')}
                   </Badge>
                 </div>
               )}
@@ -122,51 +122,50 @@ export default function PricingModal({ isOpen, onClose, currentTier = 'free' }: 
                 <div className="flex justify-center mb-2">
                   {plan.icon}
                 </div>
-                <CardTitle className="text-white text-2xl">{plan.name}</CardTitle>
+                <CardTitle className="text-white text-2xl">
+                  {t(`plans.${planKey}.name`)}
+                </CardTitle>
                 <div className="text-3xl font-bold text-white">
-                  {plan.price === 0 ? 'Free' : `$${plan.price}`}
-                  {plan.price > 0 && <span className="text-lg text-gray-400">/month</span>}
+                  {plan.price === 0
+                    ? t('billing.free')
+                    : `${t('billing.price', { price: plan.price })}${t('billing.monthly')}`
+                  }
                 </div>
                 <CardDescription className="text-gray-300">
-                  Up to {plan.maxMissions} active missions
+                  {t(`plans.${planKey}.description`)}
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="space-y-4">
-                <ul className="space-y-2">
+              <CardContent>
+                <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center space-x-2 text-gray-300">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-green-500" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Button
-                  onClick={() => handlePlanSelect(key)}
-                  disabled={currentTier === key}
-                  className={`w-full ${plan.buttonColor} text-white`}
+                  onClick={() => handlePlanSelect(planKey)}
+                  disabled={currentTier === planKey}
+                  className={`w-full ${
+                    currentTier === planKey
+                      ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
+                      : plan.buttonColor + ' text-white'
+                  }`}
                 >
-                  {currentTier === key ? 'Current Plan' :
-                   key === 'free' ? 'Downgrade' : 'Upgrade'}
+                  {currentTier === planKey
+                    ? t('actions.currentPlan')
+                    : planKey === 'free'
+                    ? t('actions.downgrade')
+                    : t('actions.selectPlan')
+                  }
                 </Button>
-
-                {currentTier === key && (
-                  <div className="text-center">
-                    <Badge variant="outline" className="text-green-400 border-green-400">
-                      Active
-                    </Badge>
-                  </div>
-                )}
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="mt-8 text-center text-gray-400 text-sm">
-          <p>All plans include mission tracking and progress monitoring.</p>
-          <p>Cancel anytime. No hidden fees.</p>
-        </div>
+        </Grid>
       </DialogContent>
     </Dialog>
   );

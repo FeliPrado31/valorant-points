@@ -1,10 +1,7 @@
 import { useTranslations, useLocale } from 'next-intl';
-import { Locale, Namespace } from '@/lib/i18n';
+import { Locale } from '@/lib/i18n';
 
-// Base hook for any namespace
-export function useNamespaceTranslations(namespace: Namespace) {
-  return useTranslations(namespace);
-}
+
 
 // Locale hook
 export function useCurrentLocale(): Locale {
@@ -27,33 +24,33 @@ export function useTranslationHelpers() {
 // Placeholder hooks for parallel development
 // These will be implemented by parallel tasks
 export function useCommonTranslations() {
-  return useNamespaceTranslations('common');
+  return useTranslations();
 }
 
 export function useNavigationTranslations() {
-  return useNamespaceTranslations('navigation');
+  return useTranslations();
 }
 
 export function useDashboardTranslations() {
-  return useNamespaceTranslations('dashboard');
+  return useTranslations();
 }
 
 export function useProfileTranslations() {
-  return useNamespaceTranslations('profile');
+  return useTranslations();
 }
 
 export function useSetupTranslations() {
-  return useNamespaceTranslations('setup');
+  return useTranslations();
 }
 
 export function useSubscriptionTranslations() {
-  return useNamespaceTranslations('subscription');
+  return useTranslations();
 }
 
 export function useMissionsTranslations() {
-  return useNamespaceTranslations('missions');
+  return useTranslations();
 }
 
 export function useErrorsTranslations() {
-  return useNamespaceTranslations('errors');
+  return useTranslations();
 }

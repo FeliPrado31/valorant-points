@@ -1,5 +1,59 @@
 {
-  "_namespace": "subscription",
-  "_status": "placeholder",
-  "_note": "Este archivo será completado por tareas paralelas"
+  "title": "Gestión de Suscripción",
+  "description": "Gestiona tu suscripción y desbloquea más misiones",
+  "plans": {
+    "free": {
+      "name": "Gratis",
+      "description": "Seguimiento básico de misiones",
+      "features": [
+        "Hasta 3 misiones activas",
+        "Seguimiento básico de progreso",
+        "Soporte de la comunidad"
+      ]
+    },
+    "standard": {
+      "name": "Estándar",
+      "description": "Experiencia mejorada de misiones",
+      "features": [
+        "Hasta 5 misiones activas",
+        "Seguimiento avanzado de misiones",
+        "Actualización diaria de misiones",
+        "Soporte prioritario"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Experiencia definitiva de misiones",
+      "features": [
+        "Hasta 10 misiones activas",
+        "Seguimiento avanzado de misiones",
+        "Actualización diaria de misiones",
+        "Soporte prioritario",
+        "Misiones exclusivas"
+      ]
+    },
+    "comparison": "Elige tu Plan"
+  },
+  "billing": {
+    "free": "Gratis",
+    "price": "${price}",
+    "monthly": "/mes",
+    "popular": "Más Popular",
+    "completeSubscription": "Completa tu Suscripción",
+    "choosePaymentMethod": "Elige tu método de pago y completa el proceso de suscripción",
+    "choosePlan": "Desbloquea más misiones y funciones con nuestros planes de suscripción"
+  },
+  "actions": {
+    "upgrade": "Mejorar",
+    "manageBilling": "Gestionar Facturación",
+    "currentPlan": "Plan Actual",
+    "selectPlan": "Seleccionar Plan",
+    "downgrade": "Degradar"
+  },
+  "status": {
+    "currentPlan": "Plan",
+    "dailySlotsUsed": "Espacios Diarios Usados",
+    "dailyLimitReached": "Límite diario alcanzado. Se reinicia en {hours} horas",
+    "upgradeAvailable": "¿Quieres más misiones? ¡Mejora tu plan!"
+  }
 }
